@@ -18,3 +18,11 @@ func (s *Service) User(ctx context.Context, req *pb.UserRequest) (*pb.UserRespon
 		},
 	}, nil
 }
+
+func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.RoutineResponse, error) {
+	return &pb.RoutineResponse{
+		Routine: &pb.Routine{
+			Name: "Caroline Girvan",
+		},
+	}, nil
+}

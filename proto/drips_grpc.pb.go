@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DripsServiceClient interface {
+	Routine(ctx context.Context, in *RoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error)
 	User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
@@ -31,6 +32,15 @@ type dripsServiceClient struct {
 
 func NewDripsServiceClient(cc grpc.ClientConnInterface) DripsServiceClient {
 	return &dripsServiceClient{cc}
+}
+
+func (c *dripsServiceClient) Routine(ctx context.Context, in *RoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error) {
+	out := new(RoutineResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/Routine", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dripsServiceClient) User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
@@ -46,6 +56,7 @@ func (c *dripsServiceClient) User(ctx context.Context, in *UserRequest, opts ...
 // All implementations must embed UnimplementedDripsServiceServer
 // for forward compatibility
 type DripsServiceServer interface {
+	Routine(context.Context, *RoutineRequest) (*RoutineResponse, error)
 	User(context.Context, *UserRequest) (*UserResponse, error)
 	mustEmbedUnimplementedDripsServiceServer()
 }
@@ -54,6 +65,9 @@ type DripsServiceServer interface {
 type UnimplementedDripsServiceServer struct {
 }
 
+func (UnimplementedDripsServiceServer) Routine(context.Context, *RoutineRequest) (*RoutineResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Routine not implemented")
+}
 func (UnimplementedDripsServiceServer) User(context.Context, *UserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method User not implemented")
 }
@@ -68,6 +82,24 @@ type UnsafeDripsServiceServer interface {
 
 func RegisterDripsServiceServer(s grpc.ServiceRegistrar, srv DripsServiceServer) {
 	s.RegisterService(&DripsService_ServiceDesc, srv)
+}
+
+func _DripsService_Routine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoutineRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).Routine(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/Routine",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).Routine(ctx, req.(*RoutineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DripsService_User_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -95,6 +127,10 @@ var DripsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "drips.DripsService",
 	HandlerType: (*DripsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Routine",
+			Handler:    _DripsService_Routine_Handler,
+		},
 		{
 			MethodName: "User",
 			Handler:    _DripsService_User_Handler,

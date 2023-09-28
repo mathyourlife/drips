@@ -6,7 +6,16 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/mathyourlife/drips/proto";
 
 service DripsService {
+    rpc Routine(RoutineRequest) returns (RoutineResponse);
     rpc User(UserRequest) returns (UserResponse);
+}
+
+message RoutineRequest {
+    string name = 1;
+}
+
+message RoutineResponse {
+    Routine routine = 1;
 }
 
 message UserRequest {
@@ -32,7 +41,7 @@ message Workout {
 
 message Routine {
     int32 routine_id = 1;
-
+    string name = 2;
 }
 
 message Activity {

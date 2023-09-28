@@ -65,3 +65,11 @@ func TestUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int32(2), resp.User.UserId)
 }
+
+func TestGetRoutine(t *testing.T) {
+	th := newTestHarness()
+
+	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{Name: "Caroline Girvan"})
+	assert.NoError(t, err)
+	assert.Equal(t, "Caroline Girvan", resp.Routine.Name)
+}
