@@ -26,6 +26,7 @@ func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.Rout
 	return &pb.RoutineResponse{
 		Routine: &pb.Routine{
 			Name:     "Caroline Girvan - Iron Series",
+			Source:   "https://www.youtube.com/watch?v=SCxNnWW2zB8",
 			Sequence: 0, // Day 1
 			Exercises: []*pb.Exercise{
 				{

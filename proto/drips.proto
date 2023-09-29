@@ -43,6 +43,7 @@ message Workout {
 message Routine {
     int32 routine_id = 1;
     string name = 2;
+    string source = 5;
     int32 sequence = 3;
 
     repeated Exercise exercises = 4;
