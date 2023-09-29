@@ -5,6 +5,7 @@ go 1.21.1
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/proullon/ramsql v0.1.2 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
