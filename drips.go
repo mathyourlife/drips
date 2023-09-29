@@ -32,18 +32,183 @@ func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.Rout
 				{
 					Sequence: 0,
 					Class: &pb.ExerciseClass{
-						Name: "squat",
+						Name:      "squat",
+						Modifiers: []string{"suitcase"},
 					},
 					Duration: &durationpb.Duration{Seconds: 60},
 					Rest:     &durationpb.Duration{Seconds: 30},
-				},
-				{
+				}, {
 					Sequence: 1,
 					Class: &pb.ExerciseClass{
-						Name: "squat",
+						Name:      "squat",
+						Modifiers: []string{"suitcase"},
 					},
 					Duration: &durationpb.Duration{Seconds: 60},
 					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 2,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"static", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 3,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"static", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 4,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"static", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 5,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"static", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 6,
+					Class: &pb.ExerciseClass{
+						Name:      "romanian dead lift",
+						ShortName: "rdl",
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 7,
+					Class: &pb.ExerciseClass{
+						Name:      "romanian dead lift",
+						ShortName: "rdl",
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 8,
+					Class: &pb.ExerciseClass{
+						Name:      "romanian dead lift",
+						ShortName: "rdl",
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 9,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"rear step", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 10,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"rear step", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 11,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"rear step", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 12,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"rear step", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 13,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet", "pause at bottom"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 14,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet", "pause at bottom"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 15,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"lateral", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 16,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"lateral", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 17,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"lateral", "left"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 18,
+					Class: &pb.ExerciseClass{
+						Name:      "lunge",
+						Modifiers: []string{"lateral", "right"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+					Rest:     &durationpb.Duration{Seconds: 30},
+				}, {
+					Sequence: 19,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet", "1/2 rep"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+				}, {
+					Sequence: 20,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+				}, {
+					Sequence: 21,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet", "1/2 rep"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
+				}, {
+					Sequence: 22,
+					Class: &pb.ExerciseClass{
+						Name:      "squat",
+						Modifiers: []string{"goblet"},
+					},
+					Duration: &durationpb.Duration{Seconds: 60},
 				},
 			},
 		},
@@ -51,10 +216,17 @@ func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.Rout
 }
 
 func PrintRoutine(routine *pb.Routine) string {
-	var out []string
-
+	var exs []string
 	for _, e := range routine.Exercises {
-		out = append(out, fmt.Sprintf("%d: %s for %d seconds then rest for %d seconds", e.Sequence+1, e.Class.Name, e.Duration.Seconds, e.Rest.Seconds))
+		var l string
+		l = fmt.Sprintf("%d: %s (%s) for %d seconds", e.Sequence+1, e.Class.Name, strings.Join(e.Class.Modifiers, ","), e.Duration.Seconds)
+		if e.Rest != nil {
+			l += fmt.Sprintf(" then rest for %d seconds", e.Rest.Seconds)
+		}
+
+		exs = append(exs, l)
 	}
-	return strings.Join(out, "\n")
+
+	out := fmt.Sprintf("%s\n#%d\n\n%s", routine.Name, routine.Sequence+1, strings.Join(exs, "\n"))
+	return out
 }

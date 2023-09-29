@@ -77,6 +77,8 @@ message Exercise {
 message ExerciseClass {
     int32 class_id = 1;
     string name = 2;
+    string short_name = 4;
+    repeated string modifiers = 3;
 }
 
 message Weight {

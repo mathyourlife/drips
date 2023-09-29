@@ -73,8 +73,32 @@ func TestGetRoutine(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "Caroline Girvan - Iron Series", resp.Routine.Name)
 
-	want := `1: squat for 60 seconds then rest for 30 seconds
-2: squat for 60 seconds then rest for 30 seconds`
+	want := `Caroline Girvan - Iron Series
+#1
+
+1: squat (suitcase) for 60 seconds then rest for 30 seconds
+2: squat (suitcase) for 60 seconds then rest for 30 seconds
+3: lunge (static,left) for 60 seconds then rest for 30 seconds
+4: lunge (static,right) for 60 seconds then rest for 30 seconds
+5: lunge (static,left) for 60 seconds then rest for 30 seconds
+6: lunge (static,right) for 60 seconds then rest for 30 seconds
+7: romanian dead lift () for 60 seconds then rest for 30 seconds
+8: romanian dead lift () for 60 seconds then rest for 30 seconds
+9: romanian dead lift () for 60 seconds then rest for 30 seconds
+10: lunge (rear step,left) for 60 seconds then rest for 30 seconds
+11: lunge (rear step,right) for 60 seconds then rest for 30 seconds
+12: lunge (rear step,left) for 60 seconds then rest for 30 seconds
+13: lunge (rear step,right) for 60 seconds then rest for 30 seconds
+14: squat (goblet,pause at bottom) for 60 seconds then rest for 30 seconds
+15: squat (goblet,pause at bottom) for 60 seconds then rest for 30 seconds
+16: lunge (lateral,left) for 60 seconds then rest for 30 seconds
+17: lunge (lateral,right) for 60 seconds then rest for 30 seconds
+18: lunge (lateral,left) for 60 seconds then rest for 30 seconds
+19: lunge (lateral,right) for 60 seconds then rest for 30 seconds
+20: squat (goblet,1/2 rep) for 60 seconds
+21: squat (goblet) for 60 seconds
+22: squat (goblet,1/2 rep) for 60 seconds
+23: squat (goblet) for 60 seconds`
 
 	assert.Equal(t, want, PrintRoutine(resp.Routine))
 }
