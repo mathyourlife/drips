@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	pb "github.com/mathyourlife/drips/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -37,195 +38,66 @@ func (s *Service) User(ctx context.Context, req *pb.UserRequest) (*pb.UserRespon
 }
 
 func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.RoutineResponse, error) {
+	// Load the routine
+	query := `SELECT routine_id, name, source, sequence
+		FROM routine
+		WHERE routine_id = $1;`
+
+	r := &pb.Routine{}
+	err := s.db.QueryRowContext(ctx, query, req.RoutineId).Scan(
+		&r.RoutineId, &r.Name, &r.Source, &r.Sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	// Load exercises
+	query = `SELECT exercise.exercise_id, exercise.sequence, class.name, exercise.duration_seconds, exercise.rest_seconds
+		FROM routine_exercise
+		JOIN exercise ON routine_exercise.exercise_id = exercise.exercise_id
+		JOIN class ON exercise.class_id = class.class_id
+		WHERE routine_exercise.routine_id = $1`
+
+	rows, err := s.db.Query(query, req.RoutineId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		e := &pb.Exercise{
+			Class: &pb.ExerciseClass{},
+		}
+		var durationSec, restSec int
+		if err := rows.Scan(&e.ExerciseId, &e.Sequence, &e.Class.Name, &durationSec, &restSec); err != nil {
+			return nil, err
+		}
+		e.Duration = durationpb.New(time.Duration(durationSec) * time.Second)
+		e.Rest = durationpb.New(time.Duration(restSec) * time.Second)
+		r.Exercises = append(r.Exercises, e)
+	}
+
+	// Load modifiers for the exercise
+	query = `SELECT modifier.name
+		FROM exercise_modifier
+		JOIN modifier ON exercise_modifier.modifier_id = modifier.modifier_id
+		WHERE exercise_modifier.exercise_id = $1`
+
+	for _, e := range r.Exercises {
+		rows, err = s.db.Query(query, e.ExerciseId)
+		if err != nil {
+			return nil, err
+		}
+
+		for rows.Next() {
+			var modifier string
+			if err := rows.Scan(&modifier); err != nil {
+				return nil, err
+			}
+			e.Class.Modifiers = append(e.Class.Modifiers, modifier)
+		}
+	}
+
 	return &pb.RoutineResponse{
-		Routine: &pb.Routine{
-			Name:     "Caroline Girvan - Iron Series",
-			Source:   "https://www.youtube.com/watch?v=SCxNnWW2zB8",
-			Sequence: 0, // Day 1
-			Exercises: []*pb.Exercise{
-				{
-					Sequence: 0,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"suitcase"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 1,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"suitcase"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 2,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"static", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 3,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"static", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 4,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"static", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 5,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"static", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 6,
-					Class: &pb.ExerciseClass{
-						Name:      "romanian dead lift",
-						ShortName: "rdl",
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 7,
-					Class: &pb.ExerciseClass{
-						Name:      "romanian dead lift",
-						ShortName: "rdl",
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 8,
-					Class: &pb.ExerciseClass{
-						Name:      "romanian dead lift",
-						ShortName: "rdl",
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 9,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"rear step", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 10,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"rear step", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 11,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"rear step", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 12,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"rear step", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 13,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet", "pause at bottom"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 14,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet", "pause at bottom"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 15,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"lateral", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 16,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"lateral", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 17,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"lateral", "left"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 18,
-					Class: &pb.ExerciseClass{
-						Name:      "lunge",
-						Modifiers: []string{"lateral", "right"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-					Rest:     &durationpb.Duration{Seconds: 30},
-				}, {
-					Sequence: 19,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet", "1/2 rep"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-				}, {
-					Sequence: 20,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-				}, {
-					Sequence: 21,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet", "1/2 rep"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-				}, {
-					Sequence: 22,
-					Class: &pb.ExerciseClass{
-						Name:      "squat",
-						Modifiers: []string{"goblet"},
-					},
-					Duration: &durationpb.Duration{Seconds: 60},
-				},
-			},
-		},
+		Routine: r,
 	}, nil
 }
 
@@ -234,7 +106,7 @@ func PrintRoutine(routine *pb.Routine) string {
 	for _, e := range routine.Exercises {
 		var l string
 		l = fmt.Sprintf("%d: %s (%s) for %d seconds", e.Sequence+1, e.Class.Name, strings.Join(e.Class.Modifiers, ","), e.Duration.Seconds)
-		if e.Rest != nil {
+		if e.Rest != nil && e.Rest.AsDuration() != 0 {
 			l += fmt.Sprintf(" then rest for %d seconds", e.Rest.Seconds)
 		}
 

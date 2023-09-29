@@ -66,8 +66,19 @@ func newTestHarness(t *testing.T) (*testHarness, error) {
 func (th *testHarness) setupDB() error {
 	stmts := []string{
 		`CREATE TABLE user (user_id BIGSERIAL PRIMARY KEY, display_name TEXT);`,
-		`INSERT INTO user (user_id, display_name) VALUES (1, 'Someone');`,
-		`INSERT INTO user (user_id, display_name) VALUES (2, 'Anyone');`,
+		`INSERT INTO user (user_id, display_name) VALUES (1, 'Someone'), (2, 'Anyone');`,
+		`CREATE TABLE routine (routine_id BIGSERIAL PRIMARY KEY, name TEXT, source TEXT, sequence INT);`,
+		`INSERT INTO routine (routine_id, name, source, sequence) VALUES (4, 'my workout', 'https://localhost', 4);`,
+		`CREATE TABLE class (class_id BIGSERIAL PRIMARY KEY, name TEXT, short_name TEXT);`,
+		`INSERT INTO class (class_id, name, short_name) VALUES (2, 'lunge', ''), (3, 'romanian dead lift', 'rdl');`,
+		`CREATE TABLE exercise (exercise_id BIGSERIAL PRIMARY KEY, sequence INT, class_id INT, duration_seconds INT, rest_seconds INT);`,
+		`INSERT INTO exercise (exercise_id, sequence, class_id, duration_seconds, rest_seconds) VALUES (6, 0, 2, 60, 30), (7, 1, 3, 60, 0);`,
+		`CREATE TABLE routine_exercise (routine_exercise_id BIGSERIAL PRIMARY KEY, routine_id INT, exercise_id INT);`,
+		`INSERT INTO routine_exercise (routine_exercise_id, routine_id, exercise_id) VALUES (11, 4, 6), (12, 4, 7);`,
+		`CREATE TABLE modifier (modifier_id BIGSERIAL PRIMARY KEY, name TEXT);`,
+		`INSERT INTO modifier (modifier_id, name) VALUES (8, 'right'), (9, 'left'), (10, 'rear step'), (11, 'staggered');`,
+		`CREATE TABLE exercise_modifier (exercise_modifier_id BIGSERIAL PRIMARY KEY, exercise_id INT, modifier_id INT);`,
+		`INSERT INTO exercise_modifier (exercise_modifier_id, exercise_id, modifier_id) VALUES (5, 6, 8), (6, 6, 10), (7, 7, 11);`,
 	}
 
 	var err error
@@ -110,36 +121,15 @@ func TestGetRoutine(t *testing.T) {
 	assert.NoError(t, err)
 	t.Cleanup(th.Close)
 
-	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{Name: "Caroline Girvan - Iron Series"})
+	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{RoutineId: 4})
 	assert.NoError(t, err)
-	assert.Equal(t, "Caroline Girvan - Iron Series", resp.Routine.Name)
+	assert.Equal(t, "my workout", resp.Routine.Name)
 
-	want := `Caroline Girvan - Iron Series
-#1
+	want := `my workout
+#5
 
-1: squat (suitcase) for 60 seconds then rest for 30 seconds
-2: squat (suitcase) for 60 seconds then rest for 30 seconds
-3: lunge (static,left) for 60 seconds then rest for 30 seconds
-4: lunge (static,right) for 60 seconds then rest for 30 seconds
-5: lunge (static,left) for 60 seconds then rest for 30 seconds
-6: lunge (static,right) for 60 seconds then rest for 30 seconds
-7: romanian dead lift () for 60 seconds then rest for 30 seconds
-8: romanian dead lift () for 60 seconds then rest for 30 seconds
-9: romanian dead lift () for 60 seconds then rest for 30 seconds
-10: lunge (rear step,left) for 60 seconds then rest for 30 seconds
-11: lunge (rear step,right) for 60 seconds then rest for 30 seconds
-12: lunge (rear step,left) for 60 seconds then rest for 30 seconds
-13: lunge (rear step,right) for 60 seconds then rest for 30 seconds
-14: squat (goblet,pause at bottom) for 60 seconds then rest for 30 seconds
-15: squat (goblet,pause at bottom) for 60 seconds then rest for 30 seconds
-16: lunge (lateral,left) for 60 seconds then rest for 30 seconds
-17: lunge (lateral,right) for 60 seconds then rest for 30 seconds
-18: lunge (lateral,left) for 60 seconds then rest for 30 seconds
-19: lunge (lateral,right) for 60 seconds then rest for 30 seconds
-20: squat (goblet,1/2 rep) for 60 seconds
-21: squat (goblet) for 60 seconds
-22: squat (goblet,1/2 rep) for 60 seconds
-23: squat (goblet) for 60 seconds`
+1: lunge (right,rear step) for 60 seconds then rest for 30 seconds
+2: romanian dead lift (staggered) for 60 seconds`
 
 	assert.Equal(t, want, PrintRoutine(resp.Routine))
 }

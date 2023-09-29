@@ -12,7 +12,7 @@ service DripsService {
 }
 
 message RoutineRequest {
-    string name = 1;
+    int32 routine_id = 1;
 }
 
 message RoutineResponse {
