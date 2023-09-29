@@ -68,7 +68,7 @@ func (th *testHarness) setupDB() error {
 		`CREATE TABLE user (user_id BIGSERIAL PRIMARY KEY, display_name TEXT);`,
 		`INSERT INTO user (user_id, display_name) VALUES (1, 'Someone'), (2, 'Anyone');`,
 		`CREATE TABLE routine (routine_id BIGSERIAL PRIMARY KEY, name TEXT, source TEXT, sequence INT);`,
-		`INSERT INTO routine (routine_id, name, source, sequence) VALUES (4, 'my workout', 'https://localhost', 4);`,
+		`INSERT INTO routine (routine_id, name, source, sequence) VALUES (4, 'my workout', 'https://localhost', 4), (5, 'neighborhood run', 'https://localhost', 0);`,
 		`CREATE TABLE class (class_id BIGSERIAL PRIMARY KEY, name TEXT, short_name TEXT);`,
 		`INSERT INTO class (class_id, name, short_name) VALUES (2, 'lunge', ''), (3, 'romanian dead lift', 'rdl');`,
 		`CREATE TABLE exercise (exercise_id BIGSERIAL PRIMARY KEY, sequence INT, class_id INT, duration_seconds INT, rest_seconds INT);`,
@@ -116,7 +116,7 @@ func TestUser(t *testing.T) {
 	assert.Equal(t, "Anyone", resp.User.DisplayName)
 }
 
-func TestGetRoutine(t *testing.T) {
+func TestRoutine(t *testing.T) {
 	th, err := newTestHarness(t)
 	assert.NoError(t, err)
 	t.Cleanup(th.Close)
@@ -132,4 +132,19 @@ func TestGetRoutine(t *testing.T) {
 2: romanian dead lift (staggered) for 60 seconds`
 
 	assert.Equal(t, want, PrintRoutine(resp.Routine))
+}
+
+func TestRoutines(t *testing.T) {
+	th, err := newTestHarness(t)
+	assert.NoError(t, err)
+	t.Cleanup(th.Close)
+
+	resp, err := th.client.Routines(context.Background(), &pb.RoutinesRequest{Name: "work"})
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(resp.Routines))
+	assert.Equal(t, "my workout", resp.Routines[0].Name)
+
+	resp, err = th.client.Routines(context.Background(), &pb.RoutinesRequest{})
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(resp.Routines))
 }

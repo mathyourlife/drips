@@ -101,6 +101,34 @@ func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.Rout
 	}, nil
 }
 
+func (s *Service) Routines(ctx context.Context, req *pb.RoutinesRequest) (*pb.RoutinesResponse, error) {
+
+	// Search exercises
+	query := `SELECT routine_id, name, source, sequence
+		FROM routine;`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var rs []*pb.Routine
+	for rows.Next() {
+		r := &pb.Routine{}
+		if err := rows.Scan(&r.RoutineId, &r.Name, &r.Source, &r.Sequence); err != nil {
+			return nil, err
+		}
+		// Match for a substring of the routine name or match all if search name is empty.
+		if strings.Contains(strings.ToLower(r.Name), strings.ToLower(req.Name)) {
+			rs = append(rs, r)
+		}
+	}
+
+	return &pb.RoutinesResponse{
+		Routines: rs,
+	}, nil
+}
+
 func PrintRoutine(routine *pb.Routine) string {
 	var exs []string
 	for _, e := range routine.Exercises {

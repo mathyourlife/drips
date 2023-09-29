@@ -8,6 +8,7 @@ option go_package = "github.com/mathyourlife/drips/proto";
 
 service DripsService {
     rpc Routine(RoutineRequest) returns (RoutineResponse);
+    rpc Routines(RoutinesRequest) returns (RoutinesResponse);
     rpc User(UserRequest) returns (UserResponse);
 }
 
@@ -17,6 +18,14 @@ message RoutineRequest {
 
 message RoutineResponse {
     Routine routine = 1;
+}
+
+message RoutinesRequest {
+    string name = 1;
+}
+
+message RoutinesResponse {
+    repeated Routine routines = 1;
 }
 
 message UserRequest {
