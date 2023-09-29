@@ -2,6 +2,8 @@ package drips
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
 	"net"
 	"testing"
@@ -11,20 +13,31 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/mathyourlife/drips/proto"
-	pb "github.com/mathyourlife/drips/proto"
+	_ "github.com/proullon/ramsql/driver"
 	"github.com/stretchr/testify/assert"
+
+	pb "github.com/mathyourlife/drips/proto"
 )
 
 type testHarness struct {
+	t      *testing.T
 	lis    *bufconn.Listener
 	server *grpc.Server
 	conn   *grpc.ClientConn
 	client pb.DripsServiceClient
+	db     *sql.DB
 }
 
-func newTestHarness() *testHarness {
-	th := &testHarness{}
-	svc := &Service{}
+func newTestHarness(t *testing.T) (*testHarness, error) {
+	th := &testHarness{
+		t: t,
+	}
+
+	if err := th.setupDB(); err != nil {
+		return nil, err
+	}
+
+	svc := NewService(th.db)
 	server := grpc.NewServer()
 	pb.RegisterDripsServiceServer(server, svc)
 
@@ -47,11 +60,34 @@ func newTestHarness() *testHarness {
 
 	th.client = proto.NewDripsServiceClient(th.conn)
 
-	return th
+	return th, nil
+}
+
+func (th *testHarness) setupDB() error {
+	stmts := []string{
+		`CREATE TABLE user (user_id BIGSERIAL PRIMARY KEY, display_name TEXT);`,
+		`INSERT INTO user (user_id, display_name) VALUES (1, 'Someone');`,
+		`INSERT INTO user (user_id, display_name) VALUES (2, 'Anyone');`,
+	}
+
+	var err error
+	th.db, err = sql.Open("ramsql", th.t.Name())
+	if err != nil {
+		return fmt.Errorf("sql.Open : Error : %w", err)
+	}
+
+	for _, stmt := range stmts {
+		_, err = th.db.Exec(stmt)
+		if err != nil {
+			return fmt.Errorf("sql.Exec: %w", err)
+		}
+	}
+	return nil
 }
 
 func (th *testHarness) Close() {
 	th.conn.Close()
+	th.db.Close()
 }
 
 func (th *testHarness) bufDialer(context.Context, string) (net.Conn, error) {
@@ -59,15 +95,20 @@ func (th *testHarness) bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func TestUser(t *testing.T) {
-	th := newTestHarness()
+	th, err := newTestHarness(t)
+	assert.NoError(t, err)
+	t.Cleanup(th.Close)
 
 	resp, err := th.client.User(context.Background(), &pb.UserRequest{UserId: 2})
 	assert.NoError(t, err)
 	assert.Equal(t, int32(2), resp.User.UserId)
+	assert.Equal(t, "Anyone", resp.User.DisplayName)
 }
 
 func TestGetRoutine(t *testing.T) {
-	th := newTestHarness()
+	th, err := newTestHarness(t)
+	assert.NoError(t, err)
+	t.Cleanup(th.Close)
 
 	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{Name: "Caroline Girvan - Iron Series"})
 	assert.NoError(t, err)

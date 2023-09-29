@@ -2,6 +2,7 @@ package drips
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 
@@ -11,14 +12,27 @@ import (
 
 type Service struct {
 	pb.UnimplementedDripsServiceServer
+	db *sql.DB
+}
+
+func NewService(db *sql.DB) *Service {
+	return &Service{
+		db: db,
+	}
 }
 
 func (s *Service) User(ctx context.Context, req *pb.UserRequest) (*pb.UserResponse, error) {
+	query := `SELECT user_id, display_name FROM user
+		WHERE user_id = $1;`
+
+	u := &pb.User{}
+	err := s.db.QueryRowContext(ctx, query, req.UserId).Scan(&u.UserId, &u.DisplayName)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pb.UserResponse{
-		User: &pb.User{
-			UserId:      2,
-			DisplayName: "Dan",
-		},
+		User: u,
 	}, nil
 }
 
