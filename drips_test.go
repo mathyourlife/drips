@@ -69,7 +69,12 @@ func TestUser(t *testing.T) {
 func TestGetRoutine(t *testing.T) {
 	th := newTestHarness()
 
-	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{Name: "Caroline Girvan"})
+	resp, err := th.client.Routine(context.Background(), &pb.RoutineRequest{Name: "Caroline Girvan - Iron Series"})
 	assert.NoError(t, err)
-	assert.Equal(t, "Caroline Girvan", resp.Routine.Name)
+	assert.Equal(t, "Caroline Girvan - Iron Series", resp.Routine.Name)
+
+	want := `1: squat for 60 seconds then rest for 30 seconds
+2: squat for 60 seconds then rest for 30 seconds`
+
+	assert.Equal(t, want, PrintRoutine(resp.Routine))
 }

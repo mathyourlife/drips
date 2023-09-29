@@ -2,6 +2,7 @@ syntax = "proto3";
 package drips;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/mathyourlife/drips/proto";
 
@@ -42,19 +43,17 @@ message Workout {
 message Routine {
     int32 routine_id = 1;
     string name = 2;
+    int32 sequence = 3;
+
+    repeated Exercise exercises = 4;
 }
 
 message Activity {
     int32 activity_id = 1;
-}
-
-message Exercise {
-    int32 action_id = 1;
-    int32 activity_id = 2;
+    int32 exercise_id = 2;
     google.protobuf.Timestamp timestamp = 3;
     int32 reps = 4;
     Weight weight = 5;
-    google.protobuf.Timestamp duration = 6;
 
     enum Rating {
         RATING_NONE = 0;
@@ -62,6 +61,21 @@ message Exercise {
         RATING_GOOD = 2;
         RATING_HARD = 3;
     }
+    Rating rating = 6;
+}
+
+message Exercise {
+    int32 exercise_id = 1;
+    int32 sequence = 2;
+    ExerciseClass class = 3;
+    google.protobuf.Duration duration = 4;
+    google.protobuf.Duration rest = 5;
+    int32 reps = 6;
+}
+
+message ExerciseClass {
+    int32 class_id = 1;
+    string name = 2;
 }
 
 message Weight {
