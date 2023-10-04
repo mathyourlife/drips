@@ -2,6 +2,22 @@
 
 Nothing like a little sweat.
 
+## Server
+
+Start the local gRPC server with CRUD operations.
+
+```bash
+go run ./cmd/server
+```
+
+## Client
+
+Run a cli client
+
+```bash
+go run ./cmd/client exercise-class list
+```
+
 ## Development
 
 Compile Golang language bindings.
