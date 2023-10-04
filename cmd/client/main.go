@@ -6,12 +6,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	pb "github.com/mathyourlife/drips/proto"
-	"github.com/urfave/cli"
 )
 
 func main() {
@@ -288,6 +288,73 @@ func main() {
 					},
 					Action: func(c *cli.Context) error {
 						_, err := client.UserDelete(context.Background(), &pb.UserDeleteRequest{UserId: int32(c.Int("user-id"))})
+						if err != nil {
+							log.Fatal(err)
+						}
+
+						return nil
+					},
+				},
+			},
+		}, {
+			Name:  "routine",
+			Usage: "routine",
+			Subcommands: []cli.Command{
+				{
+					Name:  "list",
+					Usage: "show the current list of routines",
+					Action: func(c *cli.Context) error {
+						resp, err := client.Routines(context.Background(), &pb.RoutinesRequest{Name: c.String("name")})
+						if err != nil {
+							log.Fatal(err)
+						}
+						for _, r := range resp.Routines {
+							fmt.Printf("%d %s\n", r.RoutineId, r.String())
+						}
+
+						return nil
+					},
+				}, {
+					Name:  "create",
+					Usage: "create a routine",
+					Flags: []cli.Flag{
+						cli.StringFlag{Name: "name"},
+						cli.StringFlag{Name: "source"},
+						cli.IntFlag{Name: "sequence"},
+						cli.IntSliceFlag{Name: "exercise-id"},
+					},
+					Action: func(c *cli.Context) error {
+						r := &pb.Routine{
+							Name:     c.String("name"),
+							Source:   c.String("source"),
+							Sequence: int32(c.Int("sequence")),
+						}
+						for _, eID := range c.IntSlice("exercise-id") {
+							eResp, err := client.Exercise(context.Background(), &pb.ExerciseRequest{ExerciseId: int32(eID)})
+							if err != nil {
+								log.Fatal(err)
+							}
+							r.Exercises = append(r.Exercises, eResp.GetExercise())
+						}
+						resp, err := client.RoutineCreate(context.Background(), &pb.RoutineCreateRequest{Routine: r})
+						if err != nil {
+							log.Fatal(err)
+						}
+						fmt.Println(resp.Routine)
+
+						return nil
+					},
+				}, {
+					Name:  "delete",
+					Usage: "delete a routine",
+					Flags: []cli.Flag{
+						cli.IntFlag{
+							Name:  "routine-id",
+							Usage: "ID for the routine",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						_, err := client.RoutineDelete(context.Background(), &pb.RoutineDeleteRequest{RoutineId: int32(c.Int("routine-id"))})
 						if err != nil {
 							log.Fatal(err)
 						}

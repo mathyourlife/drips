@@ -16,6 +16,20 @@ type Routine struct {
 	Exercises []Exercise `gorm:"many2many:routine_exercises;"`
 }
 
+func NewRoutineFromProto(r *pb.Routine) Routine {
+	routine := Routine{
+		Name:     r.GetName(),
+		Source:   r.GetSource(),
+		Sequence: int(r.GetSequence()),
+	}
+
+	for _, e := range r.GetExercises() {
+		routine.Exercises = append(routine.Exercises, NewExerciseFromProto(e))
+	}
+
+	return routine
+}
+
 func (m Routine) String() string {
 	return fmt.Sprintf("%s %d", m.Name, m.Sequence)
 }

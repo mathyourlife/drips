@@ -207,95 +207,45 @@ func (s *Service) UserDelete(ctx context.Context, req *pb.UserDeleteRequest) (*p
 }
 
 func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.RoutineResponse, error) {
-	// // Load the routine
-	// query := `SELECT routine_id, name, source, sequence
-	// 	FROM routine
-	// 	WHERE routine_id = $1;`
-
-	// r := &pb.Routine{}
-	// err := s.db.QueryRowContext(ctx, query, req.RoutineId).Scan(
-	// 	&r.RoutineId, &r.Name, &r.Source, &r.Sequence)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// // Load exercises
-	// query = `SELECT exercise.exercise_id, exercise.sequence, class.name, exercise.duration_seconds, exercise.rest_seconds
-	// 	FROM routine_exercise
-	// 	JOIN exercise ON routine_exercise.exercise_id = exercise.exercise_id
-	// 	JOIN class ON exercise.class_id = class.class_id
-	// 	WHERE routine_exercise.routine_id = $1`
-
-	// rows, err := s.db.Query(query, req.RoutineId)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// for rows.Next() {
-	// 	e := &pb.Exercise{
-	// 		Class: &pb.ExerciseClass{},
-	// 	}
-	// 	var durationSec, restSec int
-	// 	if err := rows.Scan(&e.ExerciseId, &e.Sequence, &e.Class.Name, &durationSec, &restSec); err != nil {
-	// 		return nil, err
-	// 	}
-	// 	e.Duration = durationpb.New(time.Duration(durationSec) * time.Second)
-	// 	e.Rest = durationpb.New(time.Duration(restSec) * time.Second)
-	// 	r.Exercises = append(r.Exercises, e)
-	// }
-
-	// // Load modifiers for the exercise
-	// query = `SELECT modifier.name
-	// 	FROM exercise_modifier
-	// 	JOIN modifier ON exercise_modifier.modifier_id = modifier.modifier_id
-	// 	WHERE exercise_modifier.exercise_id = $1`
-
-	// for _, e := range r.Exercises {
-	// 	rows, err = s.db.Query(query, e.ExerciseId)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	for rows.Next() {
-	// 		var modifier string
-	// 		if err := rows.Scan(&modifier); err != nil {
-	// 			return nil, err
-	// 		}
-	// 		e.Modifiers = append(e.Modifiers, &pb.Modifier{Name: modifier})
-	// 	}
-	// }
+	var r model.Routine
+	s.db.First(&r, req.RoutineId)
 
 	return &pb.RoutineResponse{
-		// Routine: r,
+		Routine: r.ToProto(),
 	}, nil
 }
 
 func (s *Service) Routines(ctx context.Context, req *pb.RoutinesRequest) (*pb.RoutinesResponse, error) {
+	var routines []model.Routine
+	s.db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", req.Name)).Find(&routines)
 
-	// // Search exercises
-	// query := `SELECT routine_id, name, source, sequence
-	// 	FROM routine;`
-
-	// rows, err := s.db.Query(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// var rs []*pb.Routine
-	// for rows.Next() {
-	// 	r := &pb.Routine{}
-	// 	if err := rows.Scan(&r.RoutineId, &r.Name, &r.Source, &r.Sequence); err != nil {
-	// 		return nil, err
-	// 	}
-	// 	// Match for a substring of the routine name or match all if search name is empty.
-	// 	if strings.Contains(strings.ToLower(r.Name), strings.ToLower(req.Name)) {
-	// 		rs = append(rs, r)
-	// 	}
-	// }
+	var rs []*pb.Routine
+	for _, r := range routines {
+		rs = append(rs, r.ToProto())
+	}
 
 	return &pb.RoutinesResponse{
-		// Routines: rs,
+		Routines: rs,
 	}, nil
+}
+
+func (s *Service) RoutineCreate(ctx context.Context, req *pb.RoutineCreateRequest) (*pb.RoutineCreateResponse, error) {
+	routine := req.Routine
+
+	r := model.NewRoutineFromProto(routine)
+	if err := s.db.Create(&r).Error; err != nil {
+		return nil, status.Errorf(codes.Internal, "Unable to create routine: %s", err)
+	}
+	return &pb.RoutineCreateResponse{
+		Routine: r.ToProto(),
+	}, nil
+}
+
+func (s *Service) RoutineDelete(ctx context.Context, req *pb.RoutineDeleteRequest) (*pb.RoutineDeleteResponse, error) {
+	if err := s.db.Delete(&model.Routine{}, req.RoutineId).Error; err != nil {
+		return nil, status.Errorf(codes.Internal, "Unable to delete routine-id %d: %s", req.RoutineId, err)
+	}
+	return &pb.RoutineDeleteResponse{}, nil
 }
 
 func PrintRoutine(routine *pb.Routine) string {
