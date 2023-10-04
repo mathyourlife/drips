@@ -7,9 +7,96 @@ import "google/protobuf/duration.proto";
 option go_package = "github.com/mathyourlife/drips/proto";
 
 service DripsService {
+    rpc Exercise(ExerciseRequest) returns (ExerciseResponse);
+    rpc Exercises(ExercisesRequest) returns (ExercisesResponse);
+    rpc ExerciseCreate(ExerciseCreateRequest) returns (ExerciseCreateResponse);
+    rpc ExerciseDelete(ExerciseDeleteRequest) returns (ExerciseDeleteResponse);
+    rpc ExerciseClass(ExerciseClassRequest) returns (ExerciseClassResponse);
+    rpc ExerciseClasses(ExerciseClassesRequest) returns (ExerciseClassesResponse);
+    rpc ExerciseClassCreate(ExerciseClassCreateRequest) returns (ExerciseClassCreateResponse);
+    rpc ExerciseClassDelete(ExerciseClassDeleteRequest) returns (ExerciseClassDeleteResponse);
+    rpc Modifier(ModifierRequest) returns (ModifierResponse);
+    rpc Modifiers(ModifiersRequest) returns (ModifiersResponse);
+    rpc ModifierCreate(ModifierCreateRequest) returns (ModifierCreateResponse);
+    rpc ModifierDelete(ModifierDeleteRequest) returns (ModifierDeleteResponse);
     rpc Routine(RoutineRequest) returns (RoutineResponse);
     rpc Routines(RoutinesRequest) returns (RoutinesResponse);
     rpc User(UserRequest) returns (UserResponse);
+    rpc Users(UsersRequest) returns (UsersResponse);
+    rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
+    rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse);
+}
+
+message ExerciseRequest {
+    int32 exercise_id = 1;
+}
+message ExerciseResponse {
+    Exercise exercise = 1;
+}
+message ExercisesRequest {
+    string name = 1;
+}
+message ExercisesResponse {
+    repeated Exercise exercises = 1;
+}
+message ExerciseCreateRequest {
+    Exercise exercise = 1;
+}
+message ExerciseCreateResponse {
+    Exercise exercise = 1;
+}
+message ExerciseDeleteRequest {
+    int32 exercise_id = 1;
+}
+message ExerciseDeleteResponse {
+}
+
+message ExerciseClassRequest {
+    int32 exercise_class_id = 1;
+}
+message ExerciseClassResponse {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassesRequest {
+    string name = 1;
+}
+message ExerciseClassesResponse {
+    repeated ExerciseClass exercise_classes = 1;
+}
+message ExerciseClassCreateRequest {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassCreateResponse {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassDeleteRequest {
+    int32 exercise_class_id = 1;
+}
+message ExerciseClassDeleteResponse {
+}
+
+message ModifierRequest {
+    int32 modifer_id = 1;
+}
+message ModifierResponse {
+    Modifier modifier = 1;
+}
+message ModifiersRequest {
+    string name = 1;
+}
+message ModifiersResponse {
+    repeated Modifier modifiers = 1;
+}
+message ModifierCreateRequest {
+    Modifier modifier = 1;
+}
+message ModifierCreateResponse {
+    Modifier modifier = 1;
+}
+message ModifierDeleteRequest {
+    int32 modifier_id = 1;
+}
+message ModifierDeleteResponse {
 }
 
 message RoutineRequest {
@@ -31,10 +118,25 @@ message RoutinesResponse {
 message UserRequest {
     int32 user_id = 1;
 }
-
 message UserResponse {
     User user = 1;
 }
+message UsersRequest {
+    string display_name = 1;
+}
+message UsersResponse {
+    repeated User users = 1;
+}
+message UserCreateRequest{
+    User user = 1;
+}
+message UserCreateResponse{
+    User user = 1;
+}
+message UserDeleteRequest{
+    int32 user_id = 1;
+}
+message UserDeleteResponse{}
 
 message User {
     int32 user_id = 1;
@@ -78,16 +180,21 @@ message Exercise {
     int32 exercise_id = 1;
     int32 sequence = 2;
     ExerciseClass class = 3;
+    repeated Modifier modifiers = 7;
     google.protobuf.Duration duration = 4;
     google.protobuf.Duration rest = 5;
     int32 reps = 6;
 }
 
+message Modifier {
+    int32 modifier_id = 2;
+    string name = 1;
+}
+
 message ExerciseClass {
-    int32 class_id = 1;
+    int32 exercise_class_id = 1;
     string name = 2;
     string short_name = 4;
-    repeated string modifiers = 3;
 }
 
 message Weight {
