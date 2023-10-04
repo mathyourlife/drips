@@ -2,122 +2,17 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 
-	"github.com/mathyourlife/drips/model"
 	pb "github.com/mathyourlife/drips/proto"
 	"github.com/urfave/cli"
 )
-
-func populate(db *gorm.DB) {
-
-	mods := []string{"right", "left", "pause at bottom"}
-	for _, mod := range mods {
-		var modifier model.Modifier
-		if err := db.Where(model.Modifier{Name: mod}).First(&modifier).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-			modifier := &model.Modifier{
-				Name: mod,
-			}
-			db.Save(modifier)
-		}
-	}
-
-	var left model.Modifier
-	if err := db.Where(model.Modifier{Name: "left"}).First(&left).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		log.Fatalf("unable to find modifier %q", "left")
-	}
-
-	ec := model.ExerciseClass{
-		Name:      "romanian dead lift",
-		ShortName: "rdl",
-	}
-	db.Create(&ec)
-
-	e := model.Exercise{
-		Sequence:  3,
-		Class:     ec,
-		Duration:  60 * time.Second,
-		Rest:      30 * time.Second,
-		Modifiers: []model.Modifier{left},
-	}
-	db.Create(&e)
-
-	r := model.Routine{
-		Name:      "my workout",
-		Sequence:  3,
-		Exercises: []model.Exercise{e},
-	}
-	db.Create(&r)
-}
-
-func test() {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	// Migrate the schema
-	db.Debug().AutoMigrate(
-		&model.User{},
-		&model.Modifier{},
-		&model.ExerciseClass{},
-		&model.Exercise{},
-		&model.Routine{},
-	)
-
-	populate(db)
-
-	var mods []model.Modifier
-	db.Find(&mods)
-	for _, m := range mods {
-		fmt.Println(m.ID, m.Name)
-	}
-
-	var es []model.Exercise
-	err = db.Model(&model.Exercise{}).Find(&es).Error
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, e := range es {
-		fmt.Println(e.String())
-	}
-
-	return
-
-	// Create
-	db.Create(&model.Modifier{Name: "right"})
-
-	// Read
-	var modifier model.Modifier
-	db.First(&modifier, 1)                   // find product with integer primary key
-	db.First(&modifier, "name = ?", "right") // find product with code D42
-	fmt.Println(modifier.Name)
-
-	// Update - update product's price to 200
-	db.Model(&modifier).Update("Name", "step back")
-	// Update - update multiple fields
-	db.Model(&modifier).Updates(model.Modifier{Name: "left"})
-
-	db.First(&modifier, 1) // find product with integer primary key
-	fmt.Println(modifier.Name)
-
-	// Delete - delete product
-	db.Delete(&modifier, 1)
-}
 
 func main() {
 	fmt.Println("starting client")
