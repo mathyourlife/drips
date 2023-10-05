@@ -8,7 +8,7 @@ import (
 
 type ExerciseClass struct {
 	gorm.Model
-	Name      string
+	Name      string `gorm:"uniqueIndex"`
 	ShortName string
 }
 

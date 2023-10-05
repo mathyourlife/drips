@@ -10,10 +10,10 @@ import (
 
 type Routine struct {
 	gorm.Model
-	Name      string
+	Name      string `gorm:"uniqueIndex"`
 	Source    string
 	Sequence  int
-	Exercises []Exercise `gorm:"many2many:routine_exercises;"`
+	Exercises []Exercise `gorm:"many2many:routine_exercises;save_association:false"`
 }
 
 func NewRoutineFromProto(r *pb.Routine) Routine {

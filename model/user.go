@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	gorm.Model
-	DisplayName string
+	DisplayName string `gorm:"uniqueIndex"`
 }
 
 func NewUserFromProto(u *pb.User) User {

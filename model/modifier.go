@@ -8,7 +8,7 @@ import (
 
 type Modifier struct {
 	gorm.Model
-	Name string
+	Name string `gorm:"uniqueIndex"`
 }
 
 func NewModifierFromProto(mod *pb.Modifier) Modifier {

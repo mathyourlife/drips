@@ -13,21 +13,23 @@ import (
 
 type Exercise struct {
 	gorm.Model
-	Sequence  int
-	Class     ExerciseClass `gorm:"embedded"`
-	Modifiers []Modifier    `gorm:"many2many:exercise_modifiers;"`
-	Duration  time.Duration
-	Rest      time.Duration
-	Reps      int
+	Sequence        int
+	ExerciseClassID int
+	ExerciseClass   ExerciseClass
+	Modifiers       []Modifier `gorm:"many2many:exercise_modifiers;save_association:false"`
+	Duration        time.Duration
+	Rest            time.Duration
+	Reps            int
 }
 
 func NewExerciseFromProto(e *pb.Exercise) Exercise {
 	exercise := Exercise{
-		Sequence: int(e.GetSequence()),
-		Class:    NewExerciseClassFromProto(e.GetClass()),
-		Duration: e.GetDuration().AsDuration(),
-		Rest:     e.GetRest().AsDuration(),
-		Reps:     int(e.GetReps()),
+		Sequence:        int(e.GetSequence()),
+		ExerciseClassID: int(e.GetClass().ExerciseClassId),
+		ExerciseClass:   NewExerciseClassFromProto(e.GetClass()),
+		Duration:        e.GetDuration().AsDuration(),
+		Rest:            e.GetRest().AsDuration(),
+		Reps:            int(e.GetReps()),
 	}
 
 	for _, m := range e.GetModifiers() {
@@ -38,7 +40,7 @@ func NewExerciseFromProto(e *pb.Exercise) Exercise {
 }
 
 func (m Exercise) String() string {
-	s := fmt.Sprintf("%s ", m.Class.String())
+	s := fmt.Sprintf("%s ", m.ExerciseClass.String())
 	var modStrs []string
 	for _, mod := range m.Modifiers {
 		modStrs = append(modStrs, mod.String())
@@ -62,7 +64,7 @@ func (m Exercise) ToProto() *pb.Exercise {
 	ec := &pb.Exercise{
 		ExerciseId: int32(m.ID),
 		Sequence:   int32(m.Sequence),
-		Class:      m.Class.ToProto(),
+		Class:      m.ExerciseClass.ToProto(),
 		Duration:   durationpb.New(m.Duration),
 		Rest:       durationpb.New(m.Rest),
 		Reps:       int32(m.Reps),
