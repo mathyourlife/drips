@@ -212,7 +212,8 @@ func (s *Service) UserDelete(ctx context.Context, req *pb.UserDeleteRequest) (*p
 
 func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.RoutineResponse, error) {
 	var r model.Routine
-	s.db.First(&r, req.RoutineId)
+	db := s.db.Preload("Exercises")
+	db.First(&r, req.RoutineId)
 
 	return &pb.RoutineResponse{
 		Routine: r.ToProto(),
@@ -221,7 +222,12 @@ func (s *Service) Routine(ctx context.Context, req *pb.RoutineRequest) (*pb.Rout
 
 func (s *Service) Routines(ctx context.Context, req *pb.RoutinesRequest) (*pb.RoutinesResponse, error) {
 	var routines []model.Routine
-	s.db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", req.Name)).Find(&routines)
+
+	db := s.db.Preload("Exercises")
+	if req.Name != "" {
+		db = db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", req.Name))
+	}
+	db.Find(&routines)
 
 	var rs []*pb.Routine
 	for _, r := range routines {

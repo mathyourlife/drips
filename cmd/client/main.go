@@ -308,6 +308,9 @@ func main() {
 				{
 					Name:  "list",
 					Usage: "show the current list of routines",
+					Flags: []cli.Flag{
+						cli.StringFlag{Name: "name"},
+					},
 					Action: func(c *cli.Context) error {
 						resp, err := client.Routines(context.Background(), &pb.RoutinesRequest{Name: c.String("name")})
 						if err != nil {
