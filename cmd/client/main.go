@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	fmt.Println("starting client")
 	conn, err := grpc.Dial("localhost:5050",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)

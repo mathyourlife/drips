@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	"github.com/mathyourlife/drips"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,13 +19,37 @@ import (
 )
 
 func main() {
-	fmt.Println("starting server")
+	fmt.Println("drips server")
 
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+	app := cli.NewApp()
+	app.Name = "drips-server"
+	app.Commands = []cli.Command{
+		{
+			Name:  "start",
+			Usage: "start a drips server",
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "db-file", Required: true},
+				cli.StringFlag{Name: "addr", Value: "localhost:5050"},
+			},
+			Action: func(c *cli.Context) error {
+				return startServer(c)
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func startServer(c *cli.Context) error {
+	db, err := gorm.Open(sqlite.Open(c.String("db-file")), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
-		panic("failed to connect database")
+		return fmt.Errorf("failed to connect database")
 	}
 	defer func() {
 		d, _ := db.DB()
@@ -42,9 +68,9 @@ func main() {
 	server := grpc.NewServer()
 	pb.RegisterDripsServiceServer(server, svc)
 
-	lis, err := net.Listen("tcp", "localhost:5050")
+	lis, err := net.Listen("tcp", c.String("addr"))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return fmt.Errorf("failed to listen: %v", err)
 	}
-	server.Serve(lis)
+	return server.Serve(lis)
 }
