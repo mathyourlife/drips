@@ -35,7 +35,7 @@ func NewExerciseFromProto(e *pb.Exercise) Exercise {
 	for _, m := range e.GetModifiers() {
 		exercise.Modifiers = append(exercise.Modifiers, NewModifierFromProto(m))
 	}
-
+	exercise.ID = uint(e.GetExerciseId())
 	return exercise
 }
 

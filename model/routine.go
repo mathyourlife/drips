@@ -26,7 +26,7 @@ func NewRoutineFromProto(r *pb.Routine) Routine {
 	for _, e := range r.GetExercises() {
 		routine.Exercises = append(routine.Exercises, NewExerciseFromProto(e))
 	}
-
+	routine.ID = uint(r.GetRoutineId())
 	return routine
 }
 

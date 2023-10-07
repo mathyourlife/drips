@@ -13,10 +13,12 @@ type ExerciseClass struct {
 }
 
 func NewExerciseClassFromProto(ec *pb.ExerciseClass) ExerciseClass {
-	return ExerciseClass{
+	e := ExerciseClass{
 		Name:      ec.GetName(),
 		ShortName: ec.GetShortName(),
 	}
+	e.ID = uint(ec.GetExerciseClassId())
+	return e
 }
 
 func (m ExerciseClass) String() string {

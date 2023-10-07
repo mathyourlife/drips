@@ -12,9 +12,11 @@ type User struct {
 }
 
 func NewUserFromProto(u *pb.User) User {
-	return User{
+	user := User{
 		DisplayName: u.GetDisplayName(),
 	}
+	user.ID = uint(u.GetUserId())
+	return user
 }
 
 func (m User) String() string {

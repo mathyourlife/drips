@@ -36,8 +36,13 @@ func main() {
 				{
 					Name:  "list",
 					Usage: "show the current list of exercises",
+					Flags: []cli.Flag{
+						cli.IntFlag{Name: "exercise-class-id"},
+					},
 					Action: func(c *cli.Context) error {
-						resp, err := client.Exercises(context.Background(), &pb.ExercisesRequest{})
+						resp, err := client.Exercises(context.Background(), &pb.ExercisesRequest{
+							ExerciseClassId: int32(c.Int("exercise-class-id")),
+						})
 						if err != nil {
 							log.Fatal(err)
 						}

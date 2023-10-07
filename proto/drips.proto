@@ -36,7 +36,7 @@ message ExerciseResponse {
     Exercise exercise = 1;
 }
 message ExercisesRequest {
-    string name = 1;
+    int32 exercise_class_id = 1;
 }
 message ExercisesResponse {
     repeated Exercise exercises = 1;

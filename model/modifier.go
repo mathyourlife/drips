@@ -12,9 +12,11 @@ type Modifier struct {
 }
 
 func NewModifierFromProto(mod *pb.Modifier) Modifier {
-	return Modifier{
+	m := Modifier{
 		Name: mod.GetName(),
 	}
+	m.ID = uint(mod.GetModifierId())
+	return m
 }
 
 func (m Modifier) String() string {

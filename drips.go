@@ -35,7 +35,11 @@ func (s *Service) Exercise(ctx context.Context, req *pb.ExerciseRequest) (*pb.Ex
 
 func (s *Service) Exercises(ctx context.Context, req *pb.ExercisesRequest) (*pb.ExercisesResponse, error) {
 	var exercises []model.Exercise
-	s.db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", req.Name)).Find(&exercises)
+	db := s.db.Joins("ExerciseClass").Preload("Modifiers")
+	if req.ExerciseClassId > 0 {
+		db = db.Where("exercise_class_id = ?", req.ExerciseClassId)
+	}
+	db.Find(&exercises)
 
 	var es []*pb.Exercise
 	for _, e := range exercises {
