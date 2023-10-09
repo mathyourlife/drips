@@ -71,11 +71,15 @@ func (s *Service) ExerciseDelete(ctx context.Context, req *pb.ExerciseDeleteRequ
 }
 
 func (s *Service) ExerciseClass(ctx context.Context, req *pb.ExerciseClassRequest) (*pb.ExerciseClassResponse, error) {
-	var u model.ExerciseClass
-	s.db.First(&u, req.ExerciseClassId)
+	var ec model.ExerciseClass
+	if req.ExerciseClassId > 0 {
+		s.db.First(&ec, req.ExerciseClassId)
+	} else if req.Name != "" {
+		s.db.First(&ec, "name = ?", req.Name)
+	}
 
 	return &pb.ExerciseClassResponse{
-		ExerciseClass: u.ToProto(),
+		ExerciseClass: ec.ToProto(),
 	}, nil
 }
 

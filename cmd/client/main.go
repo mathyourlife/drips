@@ -57,6 +57,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.IntFlag{Name: "sequence"},
 						cli.IntFlag{Name: "exercise-class-id"},
+						cli.StringFlag{Name: "exercise-class"},
 						cli.IntSliceFlag{Name: "modifier-id"},
 						cli.DurationFlag{Name: "duration"},
 						cli.DurationFlag{Name: "rest"},
@@ -69,7 +70,15 @@ func main() {
 							Rest:     durationpb.New(c.Duration("rest")),
 							Reps:     int32(c.Int("reps")),
 						}
-						ecResp, err := client.ExerciseClass(context.Background(), &pb.ExerciseClassRequest{ExerciseClassId: int32(c.Int("exercise-class-id"))})
+						var ecResp *pb.ExerciseClassResponse
+						var err error
+						if c.Int("exercise-class-id") > 0 {
+							ecResp, err = client.ExerciseClass(context.Background(), &pb.ExerciseClassRequest{ExerciseClassId: int32(c.Int("exercise-class-id"))})
+						} else if c.String("exercise-class") != "" {
+							ecResp, err = client.ExerciseClass(context.Background(), &pb.ExerciseClassRequest{Name: c.String("exercise-class")})
+						} else {
+							return fmt.Errorf("--exercise-class-id or --exercise-class required")
+						}
 						if err != nil {
 							log.Fatal(err)
 						}
