@@ -68,6 +68,7 @@ func startServer(c *cli.Context) error {
 	server := grpc.NewServer()
 	pb.RegisterDripsServiceServer(server, svc)
 
+	log.Printf("starting server on %s", c.String("addr"))
 	lis, err := net.Listen("tcp", c.String("addr"))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)

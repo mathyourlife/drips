@@ -73,9 +73,13 @@ func (s *Service) ExerciseDelete(ctx context.Context, req *pb.ExerciseDeleteRequ
 func (s *Service) ExerciseClass(ctx context.Context, req *pb.ExerciseClassRequest) (*pb.ExerciseClassResponse, error) {
 	var ec model.ExerciseClass
 	if req.ExerciseClassId > 0 {
-		s.db.First(&ec, req.ExerciseClassId)
+		if err := s.db.First(&ec, req.ExerciseClassId).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.InvalidArgument, "Unable to locate exercise-class-id %d", req.ExerciseClassId)
+		}
 	} else if req.Name != "" {
-		s.db.First(&ec, "name = ?", req.Name)
+		if err := s.db.First(&ec, "name = ?", req.Name).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.InvalidArgument, "Unable to locate exercise-class %s", req.Name)
+		}
 	}
 
 	return &pb.ExerciseClassResponse{
@@ -122,8 +126,14 @@ func (s *Service) ExerciseClassDelete(ctx context.Context, req *pb.ExerciseClass
 
 func (s *Service) Modifier(ctx context.Context, req *pb.ModifierRequest) (*pb.ModifierResponse, error) {
 	var modifier model.Modifier
-	if err := s.db.First(&modifier, req.ModiferId).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unable to locate modifier-id %d", req.ModiferId)
+	if req.ModiferId > 0 {
+		if err := s.db.First(&modifier, req.ModiferId).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.InvalidArgument, "Unable to locate modifier-id %d", req.ModiferId)
+		}
+	} else if req.Name != "" {
+		if err := s.db.First(&modifier, "name = ?", req.Name).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.InvalidArgument, "Unable to locate modifier %s", req.Name)
+		}
 	}
 
 	return &pb.ModifierResponse{

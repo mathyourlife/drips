@@ -59,6 +59,7 @@ func main() {
 						cli.IntFlag{Name: "exercise-class-id"},
 						cli.StringFlag{Name: "exercise-class"},
 						cli.IntSliceFlag{Name: "modifier-id"},
+						cli.StringSliceFlag{Name: "modifier"},
 						cli.DurationFlag{Name: "duration"},
 						cli.DurationFlag{Name: "rest"},
 						cli.IntFlag{Name: "reps"},
@@ -70,12 +71,13 @@ func main() {
 							Rest:     durationpb.New(c.Duration("rest")),
 							Reps:     int32(c.Int("reps")),
 						}
+						ctx := context.Background()
 						var ecResp *pb.ExerciseClassResponse
 						var err error
 						if c.Int("exercise-class-id") > 0 {
-							ecResp, err = client.ExerciseClass(context.Background(), &pb.ExerciseClassRequest{ExerciseClassId: int32(c.Int("exercise-class-id"))})
+							ecResp, err = client.ExerciseClass(ctx, &pb.ExerciseClassRequest{ExerciseClassId: int32(c.Int("exercise-class-id"))})
 						} else if c.String("exercise-class") != "" {
-							ecResp, err = client.ExerciseClass(context.Background(), &pb.ExerciseClassRequest{Name: c.String("exercise-class")})
+							ecResp, err = client.ExerciseClass(ctx, &pb.ExerciseClassRequest{Name: c.String("exercise-class")})
 						} else {
 							return fmt.Errorf("--exercise-class-id or --exercise-class required")
 						}
@@ -84,13 +86,20 @@ func main() {
 						}
 						e.Class = ecResp.GetExerciseClass()
 						for _, mID := range c.IntSlice("modifier-id") {
-							mResp, err := client.Modifier(context.Background(), &pb.ModifierRequest{ModiferId: int32(mID)})
+							mResp, err := client.Modifier(ctx, &pb.ModifierRequest{ModiferId: int32(mID)})
 							if err != nil {
 								log.Fatal(err)
 							}
 							e.Modifiers = append(e.Modifiers, mResp.GetModifier())
 						}
-						resp, err := client.ExerciseCreate(context.Background(), &pb.ExerciseCreateRequest{Exercise: e})
+						for _, mName := range c.StringSlice("modifier") {
+							mResp, err := client.Modifier(ctx, &pb.ModifierRequest{Name: mName})
+							if err != nil {
+								log.Fatal(err)
+							}
+							e.Modifiers = append(e.Modifiers, mResp.GetModifier())
+						}
+						resp, err := client.ExerciseCreate(ctx, &pb.ExerciseCreateRequest{Exercise: e})
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -345,14 +354,15 @@ func main() {
 							Source:   c.String("source"),
 							Sequence: int32(c.Int("sequence")),
 						}
+						ctx := context.Background()
 						for _, eID := range c.IntSlice("exercise-id") {
-							eResp, err := client.Exercise(context.Background(), &pb.ExerciseRequest{ExerciseId: int32(eID)})
+							eResp, err := client.Exercise(ctx, &pb.ExerciseRequest{ExerciseId: int32(eID)})
 							if err != nil {
 								log.Fatal(err)
 							}
 							r.Exercises = append(r.Exercises, eResp.GetExercise())
 						}
-						resp, err := client.RoutineCreate(context.Background(), &pb.RoutineCreateRequest{Routine: r})
+						resp, err := client.RoutineCreate(ctx, &pb.RoutineCreateRequest{Routine: r})
 						if err != nil {
 							log.Fatal(err)
 						}

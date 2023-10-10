@@ -80,6 +80,7 @@ message ExerciseClassDeleteResponse {
 
 message ModifierRequest {
     int32 modifer_id = 1;
+    string name = 2;
 }
 message ModifierResponse {
     Modifier modifier = 1;
