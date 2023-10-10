@@ -9,7 +9,6 @@ import (
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	pb "github.com/mathyourlife/drips/proto"
 )
@@ -55,22 +54,13 @@ func main() {
 					Name:  "create",
 					Usage: "create an exercise",
 					Flags: []cli.Flag{
-						cli.IntFlag{Name: "sequence"},
 						cli.IntFlag{Name: "exercise-class-id"},
 						cli.StringFlag{Name: "exercise-class"},
 						cli.IntSliceFlag{Name: "modifier-id"},
 						cli.StringSliceFlag{Name: "modifier"},
-						cli.DurationFlag{Name: "duration"},
-						cli.DurationFlag{Name: "rest"},
-						cli.IntFlag{Name: "reps"},
 					},
 					Action: func(c *cli.Context) error {
-						e := &pb.Exercise{
-							Sequence: int32(c.Int("sequence")),
-							Duration: durationpb.New(c.Duration("duration")),
-							Rest:     durationpb.New(c.Duration("rest")),
-							Reps:     int32(c.Int("reps")),
-						}
+						e := &pb.Exercise{}
 						ctx := context.Background()
 						var ecResp *pb.ExerciseClassResponse
 						var err error

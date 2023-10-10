@@ -3,9 +3,7 @@ package model
 import (
 	"fmt"
 	"strings"
-	"time"
 
-	"google.golang.org/protobuf/types/known/durationpb"
 	"gorm.io/gorm"
 
 	pb "github.com/mathyourlife/drips/proto"
@@ -13,23 +11,15 @@ import (
 
 type Exercise struct {
 	gorm.Model
-	Sequence        int
 	ExerciseClassID int
 	ExerciseClass   ExerciseClass
 	Modifiers       []Modifier `gorm:"many2many:exercise_modifiers;save_association:false"`
-	Duration        time.Duration
-	Rest            time.Duration
-	Reps            int
 }
 
 func NewExerciseFromProto(e *pb.Exercise) Exercise {
 	exercise := Exercise{
-		Sequence:        int(e.GetSequence()),
 		ExerciseClassID: int(e.GetClass().ExerciseClassId),
 		ExerciseClass:   NewExerciseClassFromProto(e.GetClass()),
-		Duration:        e.GetDuration().AsDuration(),
-		Rest:            e.GetRest().AsDuration(),
-		Reps:            int(e.GetReps()),
 	}
 
 	for _, m := range e.GetModifiers() {
@@ -48,26 +38,13 @@ func (m Exercise) String() string {
 	if len(modStrs) > 0 {
 		s += fmt.Sprintf("(%s) ", strings.Join(modStrs, ", "))
 	}
-	if m.Duration > 0 {
-		s += fmt.Sprintf("for %s ", m.Duration)
-	}
-	if m.Reps > 0 {
-		s += fmt.Sprintf("for %d reps ", m.Reps)
-	}
-	if m.Rest > 0 {
-		s += fmt.Sprintf("and then rest for %s", m.Rest)
-	}
 	return strings.TrimSpace(s)
 }
 
 func (m Exercise) ToProto() *pb.Exercise {
 	ec := &pb.Exercise{
 		ExerciseId: int32(m.ID),
-		Sequence:   int32(m.Sequence),
 		Class:      m.ExerciseClass.ToProto(),
-		Duration:   durationpb.New(m.Duration),
-		Rest:       durationpb.New(m.Rest),
-		Reps:       int32(m.Reps),
 	}
 	if len(m.Modifiers) > 0 {
 		ec.Modifiers = []*pb.Modifier{}
