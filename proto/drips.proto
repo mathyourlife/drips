@@ -1,0 +1,74 @@
+syntax = "proto3";
+package drips;
+
+option go_package = "github.com/mathyourlife/drips/proto";
+
+service DripsService {
+    rpc ExerciseClass(ExerciseClassRequest) returns (ExerciseClassResponse);
+    rpc ExerciseClasses(ExerciseClassesRequest) returns (ExerciseClassesResponse);
+    rpc ExerciseClassCreate(ExerciseClassCreateRequest) returns (ExerciseClassCreateResponse);
+    rpc ExerciseClassDelete(ExerciseClassDeleteRequest) returns (ExerciseClassDeleteResponse);
+
+    rpc User(UserRequest) returns (UserResponse);
+    rpc Users(UsersRequest) returns (UsersResponse);
+    rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
+    rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse);
+}
+
+message ExerciseClassRequest {
+    int32 exercise_class_id = 1;
+}
+message ExerciseClassResponse {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassesRequest {
+}
+message ExerciseClassesResponse {
+    repeated ExerciseClass exercise_classes = 1;
+}
+message ExerciseClassCreateRequest {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassCreateResponse {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassDeleteRequest {
+    int32 exercise_class_id = 1;
+}
+message ExerciseClassDeleteResponse {
+}
+
+message ExerciseClass {
+    int32 exercise_class_id = 1;
+    string name = 2;
+    string short_name = 3;
+}
+
+message UserRequest {
+    int32 user_id = 1;
+}
+message UserResponse {
+    User user = 1;
+}
+message UsersRequest {
+}
+message UsersResponse {
+    repeated User users = 1;
+}
+message UserCreateRequest {
+    User user = 1;
+}
+message UserCreateResponse {
+    User user = 1;
+}
+message UserDeleteRequest {
+    int32 user_id = 1;
+}
+message UserDeleteResponse {
+}
+
+message User {
+    int32 user_id = 1;
+    string first_name = 2;
+    string last_name = 3;
+}
