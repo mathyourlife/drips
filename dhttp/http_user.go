@@ -1,4 +1,4 @@
-package main
+package dhttp
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/mathyourlife/drips/proto"
 )
 
-func (s *HTTPServer) exerciseClassHandlers() {
-	s.mux.HandleFunc("GET /api/exercise_class", s.handleExerciseClass)
-	s.mux.HandleFunc("POST /api/exercise_class", s.handleExerciseClassCreate)
-	s.mux.HandleFunc("DELETE /api/exercise_class/{exerciseClassID}", s.handleExerciseClassDelete)
+func (s *HTTPServer) users() {
+	s.mux.HandleFunc("GET /api/user", s.handleUser)
+	s.mux.HandleFunc("POST /api/user", s.handleUserCreate)
+	s.mux.HandleFunc("DELETE /api/user/{userID}", s.handleUserDelete)
 }
 
-func (s *HTTPServer) ExerciseClasses() (*proto.ExerciseClassesResponse, error) {
-	response, err := s.client.ExerciseClasses(context.Background(), &proto.ExerciseClassesRequest{})
+func (s *HTTPServer) Users() (*proto.UsersResponse, error) {
+	response, err := s.client.Users(context.Background(), &proto.UsersRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -25,8 +25,8 @@ func (s *HTTPServer) ExerciseClasses() (*proto.ExerciseClassesResponse, error) {
 	return response, nil
 }
 
-func (s *HTTPServer) handleExerciseClass(w http.ResponseWriter, r *http.Request) {
-	response, err := s.ExerciseClasses()
+func (s *HTTPServer) handleUser(w http.ResponseWriter, r *http.Request) {
+	response, err := s.Users()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
@@ -41,21 +41,21 @@ func (s *HTTPServer) handleExerciseClass(w http.ResponseWriter, r *http.Request)
 	w.Write(jsonResponse)
 }
 
-func (s *HTTPServer) handleExerciseClassCreate(w http.ResponseWriter, r *http.Request) {
+func (s *HTTPServer) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 	// Unmarshal the request body into a protobuf message
-	var request proto.ExerciseClassCreateRequest
+	var request proto.UserCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	if request.ExerciseClass == nil {
-		http.Error(w, "Missing exercise class in request body", http.StatusBadRequest)
+	if request.User == nil {
+		http.Error(w, "Missing user in request body", http.StatusBadRequest)
 		return
 	}
 
 	// Send the gRPC request to the server
-	response, err := s.client.ExerciseClassCreate(context.Background(), &request)
+	response, err := s.client.UserCreate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
@@ -70,24 +70,24 @@ func (s *HTTPServer) handleExerciseClassCreate(w http.ResponseWriter, r *http.Re
 	w.Write(jsonResponse)
 }
 
-func (s *HTTPServer) handleExerciseClassDelete(w http.ResponseWriter, r *http.Request) {
-	ecIDstr := r.PathValue("exerciseClassID")
-	ecID, err := strconv.Atoi(ecIDstr)
+func (s *HTTPServer) handleUserDelete(w http.ResponseWriter, r *http.Request) {
+	uIDstr := r.PathValue("userID")
+	uID, err := strconv.Atoi(uIDstr)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse exercise class ID: %v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to parse user ID: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	request := proto.ExerciseClassDeleteRequest{
-		ExerciseClassId: int32(ecID),
+	request := proto.UserDeleteRequest{
+		UserId: int32(uID),
 	}
-	_, err = s.client.ExerciseClassDelete(context.Background(), &request)
+	_, err = s.client.UserDelete(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	response, err := s.ExerciseClasses()
+	response, err := s.Users()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return

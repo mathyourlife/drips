@@ -1,4 +1,4 @@
-package main
+package dgrpc
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 func (s *DripsServer) UserCreate(ctx context.Context, req *proto.UserCreateRequest) (*proto.UserCreateResponse, error) {
 	// Create the user in the database
 
-	result, err := dbHandle.Exec(`
+	result, err := s.db.Exec(`
 	INSERT INTO user (first_name, last_name)
 	VALUES (?, ?)
 	`, req.User.FirstName, req.User.LastName)
@@ -26,7 +26,7 @@ func (s *DripsServer) UserCreate(ctx context.Context, req *proto.UserCreateReque
 
 	// Retrieve the inserted record
 	var u proto.User
-	err = dbHandle.QueryRow(`
+	err = s.db.QueryRow(`
 	SELECT
 		user_id, first_name, last_name
 	FROM user
@@ -50,7 +50,7 @@ func (s *DripsServer) Users(ctx context.Context, req *proto.UsersRequest) (*prot
 
 	// Return the list of users
 	var us []*proto.User
-	rows, err := dbHandle.Query(`
+	rows, err := s.db.Query(`
 	SELECT
 		user_id, first_name, last_name
 	FROM user`)
@@ -74,7 +74,7 @@ func (s *DripsServer) Users(ctx context.Context, req *proto.UsersRequest) (*prot
 
 // Delete the user from the database
 func (s *DripsServer) UserDelete(ctx context.Context, req *proto.UserDeleteRequest) (*proto.UserDeleteResponse, error) {
-	_, err := dbHandle.Exec(`
+	_, err := s.db.Exec(`
 	DELETE FROM user
 	WHERE user_id = ?
 	`, req.UserId)

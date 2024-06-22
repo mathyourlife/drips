@@ -1,4 +1,4 @@
-package main
+package dhttp
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/mathyourlife/drips/proto"
 )
@@ -49,6 +50,16 @@ func (s *HTTPServer) Start() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+func grpcClient() (*grpc.ClientConn, proto.DripsServiceClient, error) {
+	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to connect to gRPC server: %s", err)
+	}
+	// Create a gRPC client
+	client := proto.NewDripsServiceClient(conn)
+	return conn, client, nil
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

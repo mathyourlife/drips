@@ -9,13 +9,9 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 )
 
-// Database connection (can be in-memory or a file).
-var dbHandle *sql.DB
-
 // Initialize database connection.
-func initDB(dbPath, migrationSourceURL string) error {
-	var err error
-	dbHandle, err = sql.Open("sqlite3", dbPath)
+func initDB(dbPath, migrationSourceURL string) (*sql.DB, error) {
+	dbHandle, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatalf("Couldn't get DB handle with path %s", dbPath)
 
@@ -43,5 +39,5 @@ func initDB(dbPath, migrationSourceURL string) error {
 	} else if err != nil {
 		log.Fatalf("Can't run migrations: %s", err)
 	}
-	return nil
+	return dbHandle, nil
 }

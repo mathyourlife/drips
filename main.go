@@ -12,8 +12,9 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/mathyourlife/drips/dgrpc"
+	"github.com/mathyourlife/drips/dhttp"
 	"github.com/mathyourlife/drips/proto"
 )
 
@@ -22,7 +23,7 @@ func main() {
 	dev := os.Getenv("DEV") == "true"
 	migrationSourceURL := os.Getenv("MIGRATION_SOURCE_URL")
 
-	err := initDB(dbPath, migrationSourceURL)
+	dbHandle, err := initDB(dbPath, migrationSourceURL)
 	if err != nil {
 		fmt.Println("Error initializing database:", err)
 		return
@@ -31,7 +32,8 @@ func main() {
 
 	// Create a gRPC server
 	grpcServer := grpc.NewServer()
-	proto.RegisterDripsServiceServer(grpcServer, &DripsServer{})
+	dripsGRPC := dgrpc.NewServer(dbHandle)
+	proto.RegisterDripsServiceServer(grpcServer, dripsGRPC)
 
 	// Start the gRPC server on a port
 	go func() {
@@ -64,21 +66,11 @@ func main() {
 		mux.Handle("/", http.FileServer(http.Dir("./frontend/build"))) // Serve the built React app
 	}
 
-	httpServer, err := NewHTTPServer(mux)
+	httpServer, err := dhttp.NewHTTPServer(mux)
 	if err != nil {
 		log.Fatalf("failed to create HTTP server: %v", err)
 	}
 	defer httpServer.Close()
 
 	httpServer.Start()
-}
-
-func grpcClient() (*grpc.ClientConn, proto.DripsServiceClient, error) {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to connect to gRPC server: %s", err)
-	}
-	// Create a gRPC client
-	client := proto.NewDripsServiceClient(conn)
-	return conn, client, nil
 }

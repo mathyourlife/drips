@@ -1,4 +1,4 @@
-package main
+package dgrpc
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 func (s *DripsServer) ExerciseClassCreate(ctx context.Context, req *proto.ExerciseClassCreateRequest) (*proto.ExerciseClassCreateResponse, error) {
 	// Create the exercise class in the database
 
-	result, err := dbHandle.Exec(`
+	result, err := s.db.Exec(`
 	INSERT INTO exercise_class (name, short_name)
 	VALUES (?, ?)
 	`, req.ExerciseClass.Name, req.ExerciseClass.ShortName)
@@ -26,7 +26,7 @@ func (s *DripsServer) ExerciseClassCreate(ctx context.Context, req *proto.Exerci
 
 	// Retrieve the inserted record
 	var ec proto.ExerciseClass
-	err = dbHandle.QueryRow(`
+	err = s.db.QueryRow(`
 	SELECT
 		exercise_class_id, name, short_name
 	FROM exercise_class
@@ -49,7 +49,7 @@ func (s *DripsServer) ExerciseClasses(ctx context.Context, req *proto.ExerciseCl
 
 	// Return the list of exercise classes
 	var ecs []*proto.ExerciseClass
-	rows, err := dbHandle.Query(`
+	rows, err := s.db.Query(`
 	SELECT
 		exercise_class_id, name, short_name
 	FROM exercise_class`)
@@ -73,7 +73,7 @@ func (s *DripsServer) ExerciseClasses(ctx context.Context, req *proto.ExerciseCl
 
 // Delete the exercise class from the database
 func (s *DripsServer) ExerciseClassDelete(ctx context.Context, req *proto.ExerciseClassDeleteRequest) (*proto.ExerciseClassDeleteResponse, error) {
-	_, err := dbHandle.Exec(`
+	_, err := s.db.Exec(`
 	DELETE FROM exercise_class
 	WHERE exercise_class_id = ?
 	`, req.ExerciseClassId)
