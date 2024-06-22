@@ -26,6 +26,10 @@ type DripsServiceClient interface {
 	ExerciseClasses(ctx context.Context, in *ExerciseClassesRequest, opts ...grpc.CallOption) (*ExerciseClassesResponse, error)
 	ExerciseClassCreate(ctx context.Context, in *ExerciseClassCreateRequest, opts ...grpc.CallOption) (*ExerciseClassCreateResponse, error)
 	ExerciseClassDelete(ctx context.Context, in *ExerciseClassDeleteRequest, opts ...grpc.CallOption) (*ExerciseClassDeleteResponse, error)
+	Modifier(ctx context.Context, in *ModifierRequest, opts ...grpc.CallOption) (*ModifierResponse, error)
+	Modifiers(ctx context.Context, in *ModifiersRequest, opts ...grpc.CallOption) (*ModifiersResponse, error)
+	ModifierCreate(ctx context.Context, in *ModifierCreateRequest, opts ...grpc.CallOption) (*ModifierCreateResponse, error)
+	ModifierDelete(ctx context.Context, in *ModifierDeleteRequest, opts ...grpc.CallOption) (*ModifierDeleteResponse, error)
 	User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	Users(ctx context.Context, in *UsersRequest, opts ...grpc.CallOption) (*UsersResponse, error)
 	UserCreate(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreateResponse, error)
@@ -76,6 +80,42 @@ func (c *dripsServiceClient) ExerciseClassDelete(ctx context.Context, in *Exerci
 	return out, nil
 }
 
+func (c *dripsServiceClient) Modifier(ctx context.Context, in *ModifierRequest, opts ...grpc.CallOption) (*ModifierResponse, error) {
+	out := new(ModifierResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/Modifier", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) Modifiers(ctx context.Context, in *ModifiersRequest, opts ...grpc.CallOption) (*ModifiersResponse, error) {
+	out := new(ModifiersResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/Modifiers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) ModifierCreate(ctx context.Context, in *ModifierCreateRequest, opts ...grpc.CallOption) (*ModifierCreateResponse, error) {
+	out := new(ModifierCreateResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/ModifierCreate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) ModifierDelete(ctx context.Context, in *ModifierDeleteRequest, opts ...grpc.CallOption) (*ModifierDeleteResponse, error) {
+	out := new(ModifierDeleteResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/ModifierDelete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dripsServiceClient) User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/drips.DripsService/User", in, out, opts...)
@@ -120,6 +160,10 @@ type DripsServiceServer interface {
 	ExerciseClasses(context.Context, *ExerciseClassesRequest) (*ExerciseClassesResponse, error)
 	ExerciseClassCreate(context.Context, *ExerciseClassCreateRequest) (*ExerciseClassCreateResponse, error)
 	ExerciseClassDelete(context.Context, *ExerciseClassDeleteRequest) (*ExerciseClassDeleteResponse, error)
+	Modifier(context.Context, *ModifierRequest) (*ModifierResponse, error)
+	Modifiers(context.Context, *ModifiersRequest) (*ModifiersResponse, error)
+	ModifierCreate(context.Context, *ModifierCreateRequest) (*ModifierCreateResponse, error)
+	ModifierDelete(context.Context, *ModifierDeleteRequest) (*ModifierDeleteResponse, error)
 	User(context.Context, *UserRequest) (*UserResponse, error)
 	Users(context.Context, *UsersRequest) (*UsersResponse, error)
 	UserCreate(context.Context, *UserCreateRequest) (*UserCreateResponse, error)
@@ -142,6 +186,18 @@ func (UnimplementedDripsServiceServer) ExerciseClassCreate(context.Context, *Exe
 }
 func (UnimplementedDripsServiceServer) ExerciseClassDelete(context.Context, *ExerciseClassDeleteRequest) (*ExerciseClassDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExerciseClassDelete not implemented")
+}
+func (UnimplementedDripsServiceServer) Modifier(context.Context, *ModifierRequest) (*ModifierResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Modifier not implemented")
+}
+func (UnimplementedDripsServiceServer) Modifiers(context.Context, *ModifiersRequest) (*ModifiersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Modifiers not implemented")
+}
+func (UnimplementedDripsServiceServer) ModifierCreate(context.Context, *ModifierCreateRequest) (*ModifierCreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ModifierCreate not implemented")
+}
+func (UnimplementedDripsServiceServer) ModifierDelete(context.Context, *ModifierDeleteRequest) (*ModifierDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ModifierDelete not implemented")
 }
 func (UnimplementedDripsServiceServer) User(context.Context, *UserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method User not implemented")
@@ -240,6 +296,78 @@ func _DripsService_ExerciseClassDelete_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DripsService_Modifier_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifierRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).Modifier(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/Modifier",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).Modifier(ctx, req.(*ModifierRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_Modifiers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifiersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).Modifiers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/Modifiers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).Modifiers(ctx, req.(*ModifiersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_ModifierCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifierCreateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).ModifierCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/ModifierCreate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).ModifierCreate(ctx, req.(*ModifierCreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_ModifierDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifierDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).ModifierDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/ModifierDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).ModifierDelete(ctx, req.(*ModifierDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DripsService_User_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserRequest)
 	if err := dec(in); err != nil {
@@ -334,6 +462,22 @@ var DripsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ExerciseClassDelete",
 			Handler:    _DripsService_ExerciseClassDelete_Handler,
+		},
+		{
+			MethodName: "Modifier",
+			Handler:    _DripsService_Modifier_Handler,
+		},
+		{
+			MethodName: "Modifiers",
+			Handler:    _DripsService_Modifiers_Handler,
+		},
+		{
+			MethodName: "ModifierCreate",
+			Handler:    _DripsService_ModifierCreate_Handler,
+		},
+		{
+			MethodName: "ModifierDelete",
+			Handler:    _DripsService_ModifierDelete_Handler,
 		},
 		{
 			MethodName: "User",

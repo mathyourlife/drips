@@ -9,6 +9,11 @@ service DripsService {
     rpc ExerciseClassCreate(ExerciseClassCreateRequest) returns (ExerciseClassCreateResponse);
     rpc ExerciseClassDelete(ExerciseClassDeleteRequest) returns (ExerciseClassDeleteResponse);
 
+    rpc Modifier(ModifierRequest) returns (ModifierResponse);
+    rpc Modifiers(ModifiersRequest) returns (ModifiersResponse);
+    rpc ModifierCreate(ModifierCreateRequest) returns (ModifierCreateResponse);
+    rpc ModifierDelete(ModifierDeleteRequest) returns (ModifierDeleteResponse);
+
     rpc User(UserRequest) returns (UserResponse);
     rpc Users(UsersRequest) returns (UsersResponse);
     rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
@@ -42,6 +47,34 @@ message ExerciseClass {
     int32 exercise_class_id = 1;
     string name = 2;
     string short_name = 3;
+}
+
+message ModifierRequest {
+    int32 modifier_id = 1;
+}
+message ModifierResponse {
+    Modifier modifier = 1;
+}
+message ModifiersRequest {
+}
+message ModifiersResponse {
+    repeated Modifier modifiers = 1;
+}
+message ModifierCreateRequest {
+    Modifier modifier = 1;
+}
+message ModifierCreateResponse {
+    Modifier modifier = 1;
+}
+message ModifierDeleteRequest {
+    int32 modifier_id = 1;
+}
+message ModifierDeleteResponse {
+}
+
+message Modifier {
+    int32 modifier_id = 1;
+    string name = 2;
 }
 
 message UserRequest {

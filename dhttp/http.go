@@ -40,6 +40,7 @@ func (s *HTTPServer) Start() {
 	// Set up object routes
 	s.exerciseClassHandlers()
 	s.users()
+	s.modifiers()
 
 	server := &http.Server{
 		Addr:    ":8080",
