@@ -4,10 +4,20 @@ package drips;
 option go_package = "github.com/mathyourlife/drips/proto";
 
 service DripsService {
+    rpc Exercise(ExerciseRequest) returns (ExerciseResponse);
+    rpc Exercises(ExercisesRequest) returns (ExercisesResponse);
+    rpc ExerciseCreate(ExerciseCreateRequest) returns (ExerciseCreateResponse);
+    rpc ExerciseDelete(ExerciseDeleteRequest) returns (ExerciseDeleteResponse);
+
     rpc ExerciseClass(ExerciseClassRequest) returns (ExerciseClassResponse);
     rpc ExerciseClasses(ExerciseClassesRequest) returns (ExerciseClassesResponse);
     rpc ExerciseClassCreate(ExerciseClassCreateRequest) returns (ExerciseClassCreateResponse);
     rpc ExerciseClassDelete(ExerciseClassDeleteRequest) returns (ExerciseClassDeleteResponse);
+
+    rpc ExerciseModifier(ExerciseModifierRequest) returns (ExerciseModifierResponse);
+    rpc ExerciseModifiers(ExerciseModifiersRequest) returns (ExerciseModifiersResponse);
+    rpc ExerciseModifierCreate(ExerciseModifierCreateRequest) returns (ExerciseModifierCreateResponse);
+    rpc ExerciseModifierDelete(ExerciseModifierDeleteRequest) returns (ExerciseModifierDeleteResponse);
 
     rpc Modifier(ModifierRequest) returns (ModifierResponse);
     rpc Modifiers(ModifiersRequest) returns (ModifiersResponse);
@@ -23,6 +33,37 @@ service DripsService {
     rpc Users(UsersRequest) returns (UsersResponse);
     rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
     rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse);
+}
+
+message ExerciseRequest {
+    int32 exercise_id = 1;
+}
+message ExerciseResponse {
+    Exercise exercise = 1;
+}
+message ExercisesRequest {
+}
+message ExercisesResponse {
+    repeated Exercise exercises = 1;
+}
+message ExerciseCreateRequest {
+    Exercise exercise = 1;
+}
+message ExerciseCreateResponse {
+    Exercise exercise = 1;
+}
+message ExerciseDeleteRequest {
+    int32 exercise_id = 1;
+}
+message ExerciseDeleteResponse {
+}
+
+message Exercise {
+    int32 exercise_id = 1;
+    int32 exercise_class_id = 2;
+    int32 duration_seconds = 3;
+    int32 rest_seconds = 4;
+    int32 repeat = 5;
 }
 
 message ExerciseClassRequest {
@@ -52,6 +93,36 @@ message ExerciseClass {
     int32 exercise_class_id = 1;
     string name = 2;
     string short_name = 3;
+}
+
+message ExerciseModifierRequest {
+    int32 exercise_modifier_id = 1;
+}
+message ExerciseModifierResponse {
+    ExerciseModifier exercise_modifier = 1;
+}
+message ExerciseModifiersRequest {
+    int32 exercise_id = 1;
+}
+message ExerciseModifiersResponse {
+    repeated ExerciseModifier exercise_modifiers = 1;
+}
+message ExerciseModifierCreateRequest {
+    ExerciseModifier exercise_modifier = 1;
+}
+message ExerciseModifierCreateResponse {
+    ExerciseModifier exercise_modifier = 1;
+}
+message ExerciseModifierDeleteRequest {
+    int32 exercise_modifier_id = 1;
+}
+message ExerciseModifierDeleteResponse {
+}
+
+message ExerciseModifier {
+    int32 exercise_modifier_id = 1;
+    int32 exercise_id = 2;
+    int32 modifier_id = 3;
 }
 
 message ModifierRequest {

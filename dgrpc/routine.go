@@ -28,7 +28,7 @@ func (s *DripsServer) RoutineCreate(ctx context.Context, req *proto.RoutineCreat
 	var r proto.Routine
 	err = s.db.QueryRow(`
         SELECT
-                routine_id, name, source
+			routine_id, name, source
         FROM routine
         WHERE routine_id = ?`, lastInsertID).Scan(
 		&r.RoutineId,
@@ -52,7 +52,7 @@ func (s *DripsServer) Routines(ctx context.Context, req *proto.RoutinesRequest) 
 	var rs []*proto.Routine
 	rows, err := s.db.Query(`
         SELECT
-                routine_id, name, source
+			routine_id, name, source
         FROM routine`)
 	if err != nil {
 		return nil, err

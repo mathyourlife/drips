@@ -28,7 +28,7 @@ func (s *DripsServer) ModifierCreate(ctx context.Context, req *proto.ModifierCre
 	var m proto.Modifier
 	err = s.db.QueryRow(`
         SELECT
-                modifier_id, name
+			modifier_id, name
         FROM modifier
         WHERE modifier_id = ?`, lastInsertID).Scan(
 		&m.ModifierId,
@@ -51,7 +51,7 @@ func (s *DripsServer) Modifiers(ctx context.Context, req *proto.ModifiersRequest
 	var ms []*proto.Modifier
 	rows, err := s.db.Query(`
         SELECT
-                modifier_id, name
+			modifier_id, name
         FROM modifier`)
 	if err != nil {
 		return nil, err

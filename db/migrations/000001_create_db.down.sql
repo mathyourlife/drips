@@ -1,1 +1,1 @@
-DROP TABLE exercise_class;
+DROP TABLE IF EXISTS exercise_class;

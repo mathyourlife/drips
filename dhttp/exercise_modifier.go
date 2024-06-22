@@ -10,14 +10,14 @@ import (
 	"github.com/mathyourlife/drips/proto"
 )
 
-func (s *HTTPServer) exerciseClassHandlers() {
-	s.mux.HandleFunc("GET /api/exercise_class", s.handleExerciseClass)
-	s.mux.HandleFunc("POST /api/exercise_class", s.handleExerciseClassCreate)
-	s.mux.HandleFunc("DELETE /api/exercise_class/{exerciseClassID}", s.handleExerciseClassDelete)
+func (s *HTTPServer) exerciseModifiers() {
+	s.mux.HandleFunc("GET /api/exercise_modifier", s.handleExerciseModifier)
+	s.mux.HandleFunc("POST /api/exercise_modifier", s.handleExerciseModifierCreate)
+	s.mux.HandleFunc("DELETE /api/exercise_modifier/{exerciseModifierID}", s.handleExerciseModifierDelete)
 }
 
-func (s *HTTPServer) ExerciseClasses() (*proto.ExerciseClassesResponse, error) {
-	response, err := s.client.ExerciseClasses(context.Background(), &proto.ExerciseClassesRequest{})
+func (s *HTTPServer) ExerciseModifiers() (*proto.ExerciseModifiersResponse, error) {
+	response, err := s.client.ExerciseModifiers(context.Background(), &proto.ExerciseModifiersRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -25,8 +25,8 @@ func (s *HTTPServer) ExerciseClasses() (*proto.ExerciseClassesResponse, error) {
 	return response, nil
 }
 
-func (s *HTTPServer) handleExerciseClass(w http.ResponseWriter, r *http.Request) {
-	response, err := s.ExerciseClasses()
+func (s *HTTPServer) handleExerciseModifier(w http.ResponseWriter, r *http.Request) {
+	response, err := s.ExerciseModifiers()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
@@ -41,21 +41,21 @@ func (s *HTTPServer) handleExerciseClass(w http.ResponseWriter, r *http.Request)
 	w.Write(jsonResponse)
 }
 
-func (s *HTTPServer) handleExerciseClassCreate(w http.ResponseWriter, r *http.Request) {
+func (s *HTTPServer) handleExerciseModifierCreate(w http.ResponseWriter, r *http.Request) {
 	// Unmarshal the request body into a protobuf message
-	var request proto.ExerciseClassCreateRequest
+	var request proto.ExerciseModifierCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	if request.ExerciseClass == nil {
-		http.Error(w, "Missing exercise class in request body", http.StatusBadRequest)
+	if request.ExerciseModifier == nil {
+		http.Error(w, "Missing exercise modifier in request body", http.StatusBadRequest)
 		return
 	}
 
 	// Send the gRPC request to the server
-	response, err := s.client.ExerciseClassCreate(context.Background(), &request)
+	response, err := s.client.ExerciseModifierCreate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
@@ -70,24 +70,24 @@ func (s *HTTPServer) handleExerciseClassCreate(w http.ResponseWriter, r *http.Re
 	w.Write(jsonResponse)
 }
 
-func (s *HTTPServer) handleExerciseClassDelete(w http.ResponseWriter, r *http.Request) {
-	ecIDstr := r.PathValue("exerciseClassID")
-	ecID, err := strconv.Atoi(ecIDstr)
+func (s *HTTPServer) handleExerciseModifierDelete(w http.ResponseWriter, r *http.Request) {
+	emIDstr := r.PathValue("exerciseModifierID")
+	emID, err := strconv.Atoi(emIDstr)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse exercise class ID: %v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to parse exercise modifier ID: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	request := proto.ExerciseClassDeleteRequest{
-		ExerciseClassId: int32(ecID),
+	request := proto.ExerciseModifierDeleteRequest{
+		ExerciseModifierId: int32(emID),
 	}
-	_, err = s.client.ExerciseClassDelete(context.Background(), &request)
+	_, err = s.client.ExerciseModifierDelete(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	response, err := s.ExerciseClasses()
+	response, err := s.ExerciseModifiers()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return

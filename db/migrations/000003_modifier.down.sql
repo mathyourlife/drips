@@ -1,1 +1,1 @@
-DROP TABLE modifier;
+DROP TABLE IF EXISTS modifier;

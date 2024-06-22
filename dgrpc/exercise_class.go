@@ -44,6 +44,27 @@ func (s *DripsServer) ExerciseClassCreate(ctx context.Context, req *proto.Exerci
 	}, nil
 }
 
+func (s *DripsServer) ExerciseClass(ctx context.Context, req *proto.ExerciseClassRequest) (*proto.ExerciseClassResponse, error) {
+	var ec proto.ExerciseClass
+	err := s.db.QueryRow(`
+	SELECT
+		exercise_class_id, name, short_name
+	FROM exercise_class
+	WHERE exercise_class_id = ?`, req.ExerciseClassId).Scan(
+		&ec.ExerciseClassId,
+		&ec.Name,
+		&ec.ShortName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ExerciseClassResponse{
+		ExerciseClass: &ec,
+	}, nil
+
+}
+
 // Implement your gRPC methods
 func (s *DripsServer) ExerciseClasses(ctx context.Context, req *proto.ExerciseClassesRequest) (*proto.ExerciseClassesResponse, error) {
 

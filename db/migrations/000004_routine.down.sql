@@ -1,1 +1,1 @@
-DROP TABLE routine;
+DROP TABLE IF EXISTS routine;
