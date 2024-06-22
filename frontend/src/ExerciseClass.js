@@ -58,7 +58,11 @@ function ExerciseClass() {
         return res.json(); // Assuming the response contains the updated list
       })
       .then(data => {
-        setExerciseClasses(data.exercise_classes); // Update the state with the new list
+        if (data.exercise_classes) {
+          setExerciseClasses(data.exercise_classes);
+        } else {
+          setExerciseClasses([]);
+        }
       })
       .catch(error => console.error('Error deleting class:', error));
   };

@@ -41,6 +41,7 @@ func (s *HTTPServer) Start() {
 	s.exerciseClassHandlers()
 	s.users()
 	s.modifiers()
+	s.routines()
 
 	server := &http.Server{
 		Addr:    ":8080",

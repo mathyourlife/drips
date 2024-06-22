@@ -30,6 +30,10 @@ type DripsServiceClient interface {
 	Modifiers(ctx context.Context, in *ModifiersRequest, opts ...grpc.CallOption) (*ModifiersResponse, error)
 	ModifierCreate(ctx context.Context, in *ModifierCreateRequest, opts ...grpc.CallOption) (*ModifierCreateResponse, error)
 	ModifierDelete(ctx context.Context, in *ModifierDeleteRequest, opts ...grpc.CallOption) (*ModifierDeleteResponse, error)
+	Routine(ctx context.Context, in *RoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error)
+	Routines(ctx context.Context, in *RoutinesRequest, opts ...grpc.CallOption) (*RoutinesResponse, error)
+	RoutineCreate(ctx context.Context, in *RoutineCreateRequest, opts ...grpc.CallOption) (*RoutineCreateResponse, error)
+	RoutineDelete(ctx context.Context, in *RoutineDeleteRequest, opts ...grpc.CallOption) (*RoutineDeleteResponse, error)
 	User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	Users(ctx context.Context, in *UsersRequest, opts ...grpc.CallOption) (*UsersResponse, error)
 	UserCreate(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreateResponse, error)
@@ -116,6 +120,42 @@ func (c *dripsServiceClient) ModifierDelete(ctx context.Context, in *ModifierDel
 	return out, nil
 }
 
+func (c *dripsServiceClient) Routine(ctx context.Context, in *RoutineRequest, opts ...grpc.CallOption) (*RoutineResponse, error) {
+	out := new(RoutineResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/Routine", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) Routines(ctx context.Context, in *RoutinesRequest, opts ...grpc.CallOption) (*RoutinesResponse, error) {
+	out := new(RoutinesResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/Routines", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) RoutineCreate(ctx context.Context, in *RoutineCreateRequest, opts ...grpc.CallOption) (*RoutineCreateResponse, error) {
+	out := new(RoutineCreateResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/RoutineCreate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dripsServiceClient) RoutineDelete(ctx context.Context, in *RoutineDeleteRequest, opts ...grpc.CallOption) (*RoutineDeleteResponse, error) {
+	out := new(RoutineDeleteResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/RoutineDelete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dripsServiceClient) User(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/drips.DripsService/User", in, out, opts...)
@@ -164,6 +204,10 @@ type DripsServiceServer interface {
 	Modifiers(context.Context, *ModifiersRequest) (*ModifiersResponse, error)
 	ModifierCreate(context.Context, *ModifierCreateRequest) (*ModifierCreateResponse, error)
 	ModifierDelete(context.Context, *ModifierDeleteRequest) (*ModifierDeleteResponse, error)
+	Routine(context.Context, *RoutineRequest) (*RoutineResponse, error)
+	Routines(context.Context, *RoutinesRequest) (*RoutinesResponse, error)
+	RoutineCreate(context.Context, *RoutineCreateRequest) (*RoutineCreateResponse, error)
+	RoutineDelete(context.Context, *RoutineDeleteRequest) (*RoutineDeleteResponse, error)
 	User(context.Context, *UserRequest) (*UserResponse, error)
 	Users(context.Context, *UsersRequest) (*UsersResponse, error)
 	UserCreate(context.Context, *UserCreateRequest) (*UserCreateResponse, error)
@@ -198,6 +242,18 @@ func (UnimplementedDripsServiceServer) ModifierCreate(context.Context, *Modifier
 }
 func (UnimplementedDripsServiceServer) ModifierDelete(context.Context, *ModifierDeleteRequest) (*ModifierDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ModifierDelete not implemented")
+}
+func (UnimplementedDripsServiceServer) Routine(context.Context, *RoutineRequest) (*RoutineResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Routine not implemented")
+}
+func (UnimplementedDripsServiceServer) Routines(context.Context, *RoutinesRequest) (*RoutinesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Routines not implemented")
+}
+func (UnimplementedDripsServiceServer) RoutineCreate(context.Context, *RoutineCreateRequest) (*RoutineCreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RoutineCreate not implemented")
+}
+func (UnimplementedDripsServiceServer) RoutineDelete(context.Context, *RoutineDeleteRequest) (*RoutineDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RoutineDelete not implemented")
 }
 func (UnimplementedDripsServiceServer) User(context.Context, *UserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method User not implemented")
@@ -368,6 +424,78 @@ func _DripsService_ModifierDelete_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DripsService_Routine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoutineRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).Routine(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/Routine",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).Routine(ctx, req.(*RoutineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_Routines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoutinesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).Routines(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/Routines",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).Routines(ctx, req.(*RoutinesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_RoutineCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoutineCreateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).RoutineCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/RoutineCreate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).RoutineCreate(ctx, req.(*RoutineCreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DripsService_RoutineDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoutineDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).RoutineDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/RoutineDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).RoutineDelete(ctx, req.(*RoutineDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DripsService_User_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserRequest)
 	if err := dec(in); err != nil {
@@ -478,6 +606,22 @@ var DripsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ModifierDelete",
 			Handler:    _DripsService_ModifierDelete_Handler,
+		},
+		{
+			MethodName: "Routine",
+			Handler:    _DripsService_Routine_Handler,
+		},
+		{
+			MethodName: "Routines",
+			Handler:    _DripsService_Routines_Handler,
+		},
+		{
+			MethodName: "RoutineCreate",
+			Handler:    _DripsService_RoutineCreate_Handler,
+		},
+		{
+			MethodName: "RoutineDelete",
+			Handler:    _DripsService_RoutineDelete_Handler,
 		},
 		{
 			MethodName: "User",

@@ -51,7 +51,11 @@ function Modifier() {
         return res.json(); // Assuming the response contains the updated list
       })
       .then(data => {
-        setModifiers(data.modifiers); // Update the state with the new list
+        if (data.modifiers) {
+          setModifiers(data.modifiers);
+        } else {
+          setModifiers([]);
+        }
       })
       .catch(error => console.error('Error deleting modifier:', error));
   };

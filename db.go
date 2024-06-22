@@ -33,7 +33,7 @@ func initDB(dbPath, migrationSourceURL string) (*sql.DB, error) {
 		log.Printf("Can't get DB version! %s", err)
 	}
 	log.Println("DB version is", version)
-	err = m.Migrate(3)
+	err = m.Migrate(4)
 	if errors.Is(err, migrate.ErrNoChange) {
 		log.Println("No migrations to run")
 	} else if err != nil {

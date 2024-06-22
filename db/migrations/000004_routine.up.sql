@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS routine (
+    routine_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    source TEXT NOT NULL
+);

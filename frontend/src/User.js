@@ -54,7 +54,11 @@ function User() {
         return res.json(); // Assuming the response contains the updated list
       })
       .then(data => {
-        setUsers(data.users); // Update the state with the new list
+        if (data.users) {
+          setUsers(data.users);
+        } else {
+          setUsers([]);
+        }
       })
       .catch(error => console.error('Error deleting user:', error));
   };

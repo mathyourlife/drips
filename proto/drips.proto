@@ -14,6 +14,11 @@ service DripsService {
     rpc ModifierCreate(ModifierCreateRequest) returns (ModifierCreateResponse);
     rpc ModifierDelete(ModifierDeleteRequest) returns (ModifierDeleteResponse);
 
+    rpc Routine(RoutineRequest) returns (RoutineResponse);
+    rpc Routines(RoutinesRequest) returns (RoutinesResponse);
+    rpc RoutineCreate(RoutineCreateRequest) returns (RoutineCreateResponse);
+    rpc RoutineDelete(RoutineDeleteRequest) returns (RoutineDeleteResponse);
+
     rpc User(UserRequest) returns (UserResponse);
     rpc Users(UsersRequest) returns (UsersResponse);
     rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
@@ -75,6 +80,35 @@ message ModifierDeleteResponse {
 message Modifier {
     int32 modifier_id = 1;
     string name = 2;
+}
+
+message RoutineRequest {
+    int32 routine_id = 1;
+}
+message RoutineResponse {
+    Routine routine = 1;
+}
+message RoutinesRequest {
+}
+message RoutinesResponse {
+    repeated Routine routines = 1;
+}
+message RoutineCreateRequest {
+    Routine routine = 1;
+}
+message RoutineCreateResponse {
+    Routine routine = 1;
+}
+message RoutineDeleteRequest {
+    int32 routine_id = 1;
+}
+message RoutineDeleteResponse {
+}
+
+message Routine {
+    int32 routine_id = 1;
+    string name = 2;
+    string source = 3;
 }
 
 message UserRequest {
