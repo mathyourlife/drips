@@ -117,18 +117,24 @@ function Routine() {
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Routine</h2>
-          <input
-            type="text"
-            placeholder="Name"
-            value={newName}
-            onChange={handleNameChange}
-          />
-          <input
-            type="text"
-            placeholder="Source"
-            value={newSource}
-            onChange={handleSourceChange}
-          /> {/* Input field for source */}
+          <div>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newName}
+              onChange={handleNameChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="source">Source:</label>
+            <input
+              type="text"
+              placeholder="Source"
+              value={newSource}
+              onChange={handleSourceChange}
+            /> {/* Input field for source */}
+          </div>
           <button onClick={handleCreateRoutine}>Create</button>
           <button onClick={handleDialogClose}>Cancel</button>
         </div>

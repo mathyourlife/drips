@@ -107,12 +107,15 @@ function Modifier() {
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Modifier</h2>
-          <input
-            type="text"
-            placeholder="Name"
-            value={newName}
-            onChange={handleNameChange}
-          />
+          <div>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newName}
+              onChange={handleNameChange}
+            />
+          </div>
           <button onClick={handleCreateModifier}>Create</button>
           <button onClick={handleDialogClose}>Cancel</button>
         </div>

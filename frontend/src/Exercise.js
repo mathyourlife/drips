@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Select, MenuItem, styled } from '@mui/material';
-
-const StyledSelect = styled(Select)`
-  width: 250px; // Adjust the width as needed
-`;
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Select, MenuItem } from '@mui/material';
 
 function Exercise() {
   const [exercises, setExercises] = useState([]);
@@ -100,10 +96,6 @@ function Exercise() {
     setNewExerciseClassId(event.target.value);
   };
 
-  const handleExerciseClassIdChange = (event) => {
-    setNewExerciseClassId(event.target.value);
-  };
-
   const handleDurationSecondsChange = (event) => {
     setNewDurationSeconds(event.target.value);
   };
@@ -158,10 +150,11 @@ function Exercise() {
           <h2>Create New Exercise</h2>
           <div>
             <label htmlFor="exerciseClass">Exercise Class:</label>
-            <StyledSelect
+            <Select
               value={newExerciseClassId}
               onChange={handleExerciseClassChange}
               placeholder="Exercise Class"
+              style={{ width: 250 }}
             >
               <MenuItem value="">
                 <em>Exercise Class</em>
@@ -171,7 +164,7 @@ function Exercise() {
                   {exerciseClass.name}
                 </MenuItem>
               ))}
-            </StyledSelect>
+            </Select>
           </div>
           <div>
             <label htmlFor="duration">Duration (seconds):</label>

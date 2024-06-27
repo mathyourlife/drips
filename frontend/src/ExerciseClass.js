@@ -121,18 +121,24 @@ function ExerciseClass() {
       {isDialogOpen && (
         <div className="dialog">
           <h2>Create New Exercise Class</h2>
-          <input
-            type="text"
-            placeholder="Name"
-            value={newClassName}
-            onChange={handleNameChange}
-          />
-          <input
-            type="text"
-            placeholder="Short Name"
-            value={newShortName}
-            onChange={handleShortNameChange}
-          />
+          <div>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newClassName}
+              onChange={handleNameChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="shortname">Short Name:</label>
+            <input
+              type="text"
+              placeholder="Short Name"
+              value={newShortName}
+              onChange={handleShortNameChange}
+            />
+          </div>
           <button onClick={handleCreateClass}>Create</button>
           <button onClick={handleDialogClose}>Cancel</button>
         </div>

@@ -117,18 +117,24 @@ function User() {
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New User</h2>
-          <input
-            type="text"
-            placeholder="First Name"
-            value={newFirstName}
-            onChange={handleFirstNameChange}
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={newLastName}
-            onChange={handleLastNameChange}
-          />
+          <div>
+            <label htmlFor="firstname">First Name:</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={newFirstName}
+              onChange={handleFirstNameChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="lastname">Last Name:</label>
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={newLastName}
+              onChange={handleLastNameChange}
+            />
+          </div>
           <button onClick={handleCreateUser}>Create</button>
           <button onClick={handleDialogClose}>Cancel</button>
         </div>
