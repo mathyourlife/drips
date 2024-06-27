@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Select, MenuItem, styled } from '@mui/material';
+
+const StyledSelect = styled(Select)`
+  width: 250px; // Adjust the width as needed
+`;
 
 function Exercise() {
   const [exercises, setExercises] = useState([]);
+  const [exerciseClasses, setExerciseClasses] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newExerciseClassId, setNewExerciseClassId] = useState('');
   const [newDurationSeconds, setNewDurationSeconds] = useState('');
@@ -10,17 +15,27 @@ function Exercise() {
   const [newRepeat, setNewRepeat] = useState('');
 
   useEffect(() => {
+    // Fetch exercises data
     fetch('/api/exercise')
-      .then(res => res.json())
-      .then(data => {
-        if (data.exercises) {
-          setExercises(data.exercises);
-        } else {
-          setExercises([]);
-        }
-      })
-      .catch(error => console.error('Error fetching data:', error));
+      .then(response => response.json())
+      .then(data => setExercises(data.exercises));
+
+    // Fetch exercise classes data
+    fetch('/api/exercise_class')
+      .then(response => response.json())
+      .then(data => setExerciseClasses(data.exercise_classes));
   }, []);
+
+  // Combine data from both APIs
+  const combinedData = exercises.map(exercise => {
+    const exerciseClass = exerciseClasses.find(
+      classItem => classItem.exercise_class_id === exercise.exercise_class_id
+    );
+    return {
+      ...exercise,
+      exerciseClassName: exerciseClass ? exerciseClass.name : 'N/A',
+    };
+  });
 
   const handleCreateExercise = () => {
     const newExercise = {
@@ -81,6 +96,10 @@ function Exercise() {
     setIsDialogOpen(false);
   };
 
+  const handleExerciseClassChange = (event) => {
+    setNewExerciseClassId(event.target.value);
+  };
+
   const handleExerciseClassIdChange = (event) => {
     setNewExerciseClassId(event.target.value);
   };
@@ -104,7 +123,7 @@ function Exercise() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Exercise Class ID</TableCell>
+              <TableCell>Exercise Class Name</TableCell>
               <TableCell>Duration (seconds)</TableCell>
               <TableCell>Rest (seconds)</TableCell>
               <TableCell>Repeat</TableCell>
@@ -112,14 +131,14 @@ function Exercise() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {exercises.length === 0 && (
+          {exercises.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">No exercises found</TableCell>
               </TableRow>
             )}
-            {exercises.map(exercise => (
+            {combinedData.map(exercise => (
               <TableRow key={exercise.exercise_id}>
-                <TableCell>{exercise.exercise_class_id}</TableCell>
+                <TableCell>{exercise.exerciseClassName}</TableCell>
                 <TableCell>{exercise.duration_seconds}</TableCell>
                 <TableCell>{exercise.rest_seconds}</TableCell>
                 <TableCell>{exercise.repeat}</TableCell>
@@ -137,36 +156,56 @@ function Exercise() {
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Exercise</h2>
-          <input
-            type="text"
-            placeholder="Exercise Class ID"
-            value={newExerciseClassId}
-            onChange={handleExerciseClassIdChange}
-          />
-          <input
-            type="text"
-            placeholder="Duration (seconds)"
-            value={newDurationSeconds}
-            onChange={handleDurationSecondsChange}
-          />
-          <input
-            type="text"
-            placeholder="Rest (seconds)"
-            value={newRestSeconds}
-            onChange={handleRestSecondsChange}
-          />
-          <input
-            type="text"
-            placeholder="Repeat"
-            value={newRepeat}
-            onChange={handleRepeatChange}
-          />
+          <div>
+            <label htmlFor="exerciseClass">Exercise Class:</label>
+            <StyledSelect
+              value={newExerciseClassId}
+              onChange={handleExerciseClassChange}
+              placeholder="Exercise Class"
+            >
+              <MenuItem value="">
+                <em>Exercise Class</em>
+              </MenuItem>
+              {exerciseClasses.map(exerciseClass => (
+                <MenuItem key={exerciseClass.exercise_class_id} value={exerciseClass.exercise_class_id}>
+                  {exerciseClass.name}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </div>
+          <div>
+            <label htmlFor="duration">Duration (seconds):</label>
+            <input
+              type="text"
+              placeholder="Duration (seconds)"
+              value={newDurationSeconds}
+              onChange={handleDurationSecondsChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="rest">Rest (seconds):</label>
+            <input
+              type="text"
+              placeholder="Rest (seconds)"
+              value={newRestSeconds}
+              onChange={handleRestSecondsChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="repeat">Repeat:</label>
+            <input
+              type="text"
+              placeholder="Repeat"
+              value={newRepeat}
+              onChange={handleRepeatChange}
+            />
+          </div>
           <button onClick={handleCreateExercise}>Create</button>
           <button onClick={handleDialogClose}>Cancel</button>
         </div>
       )}
-    </div>
-  );
+      </div>
+    );
 }
 
 export default Exercise;
