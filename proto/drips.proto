@@ -64,6 +64,7 @@ message Exercise {
     int32 duration_seconds = 3;
     int32 rest_seconds = 4;
     int32 repeat = 5;
+    string name = 6;
 }
 
 message ExerciseClassRequest {

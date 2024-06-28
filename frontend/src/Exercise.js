@@ -5,6 +5,7 @@ function Exercise() {
   const [exercises, setExercises] = useState([]);
   const [exerciseClasses, setExerciseClasses] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseClassId, setNewExerciseClassId] = useState('');
   const [newDurationSeconds, setNewDurationSeconds] = useState('');
   const [newRestSeconds, setNewRestSeconds] = useState('');
@@ -36,6 +37,7 @@ function Exercise() {
   const handleCreateExercise = () => {
     const newExercise = {
       exercise: {
+        name: newExerciseName,
         exercise_class_id: parseInt(newExerciseClassId),
         duration_seconds: parseInt(newDurationSeconds),
         rest_seconds: parseInt(newRestSeconds),
@@ -52,6 +54,7 @@ function Exercise() {
       .then(data => {
         setExercises([...exercises, data.exercise]);
         setIsDialogOpen(false);
+        setNewExerciseName('');
         setNewExerciseClassId('');
         setNewDurationSeconds('');
         setNewRestSeconds('');
@@ -85,11 +88,16 @@ function Exercise() {
   };
 
   const handleDialogClose = () => {
+    setNewExerciseName('');
     setNewExerciseClassId('');
     setNewDurationSeconds('');
     setNewRestSeconds('');
     setNewRepeat('');
     setIsDialogOpen(false);
+  };
+
+  const handleExerciseNameChange = (event) => {
+    setNewExerciseName(event.target.value);
   };
 
   const handleExerciseClassChange = (event) => {
@@ -118,6 +126,7 @@ function Exercise() {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell>Exercise Name</TableCell>
                   <TableCell>Exercise Class Name</TableCell>
                   <TableCell>Duration (seconds)</TableCell>
                   <TableCell>Rest (seconds)</TableCell>
@@ -133,6 +142,7 @@ function Exercise() {
                 )}
                 {combinedData.map(exercise => (
                   <TableRow key={exercise.exercise_id}>
+                    <TableCell>{exercise.name}</TableCell>
                     <TableCell>{exercise.exerciseClassName}</TableCell>
                     <TableCell>{exercise.duration_seconds}</TableCell>
                     <TableCell>{exercise.rest_seconds}</TableCell>
@@ -152,6 +162,15 @@ function Exercise() {
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Exercise</h2>
+          <div>
+            <label htmlFor="name">Exercise Name:</label>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newExerciseName}
+              onChange={handleExerciseNameChange}
+            />
+          </div>
           <div>
             <label htmlFor="exerciseClass">Exercise Class:</label>
             <Select
