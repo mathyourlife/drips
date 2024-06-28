@@ -76,34 +76,38 @@ function Modifier() {
   return (
     <div>
       <h1>Modifiers</h1>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {modifiers.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={2} align="center">No modifiers found</TableCell>
-              </TableRow>
-            )}
-            {modifiers.map(modifier => (
-              <TableRow key={modifier.modifier_id}>
-                <TableCell>{modifier.name}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="error" onClick={() => handleDeleteModifier(modifier.modifier_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <button onClick={handleDialogOpen}>Create New Modifier</button>
+      {!isDialogOpen && (
+        <div>
+          <button onClick={handleDialogOpen}>Create New Modifier</button>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {modifiers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={2} align="center">No modifiers found</TableCell>
+                  </TableRow>
+                )}
+                {modifiers.map(modifier => (
+                  <TableRow key={modifier.modifier_id}>
+                    <TableCell>{modifier.name}</TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="error" onClick={() => handleDeleteModifier(modifier.modifier_id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Modifier</h2>

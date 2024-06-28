@@ -88,36 +88,40 @@ function ExerciseClass() {
   return (
     <div>
       <h1>Exercise Classes</h1>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Short Name</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {exerciseClasses.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={3} align="center">No exercise classes found</TableCell>
-              </TableRow>
-            )}
-            {exerciseClasses.map(exerciseClass => (
-              <TableRow key={exerciseClass.exercise_class_id}>
-                <TableCell>{exerciseClass.name}</TableCell>
-                <TableCell>{exerciseClass.short_name}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="error" onClick={() => handleDeleteClass(exerciseClass.exercise_class_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <button onClick={handleDialogOpen}>Create New Class</button>
+      {!isDialogOpen && (
+        <div>
+          <button onClick={handleDialogOpen}>Create New Class</button>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Short Name</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {exerciseClasses.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">No exercise classes found</TableCell>
+                  </TableRow>
+                )}
+                {exerciseClasses.map(exerciseClass => (
+                  <TableRow key={exerciseClass.exercise_class_id}>
+                    <TableCell>{exerciseClass.name}</TableCell>
+                    <TableCell>{exerciseClass.short_name}</TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="error" onClick={() => handleDeleteClass(exerciseClass.exercise_class_id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
       {isDialogOpen && (
         <div className="dialog">
           <h2>Create New Exercise Class</h2>

@@ -84,36 +84,40 @@ function User() {
   return (
     <div>
       <h1>Users</h1>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={3} align="center">No users found</TableCell>
-              </TableRow>
-            )}
-            {users.map(user => (
-              <TableRow key={user.user_id}>
-                <TableCell>{user.first_name}</TableCell>
-                <TableCell>{user.last_name}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="error" onClick={() => handleDeleteUser(user.user_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <button onClick={handleDialogOpen}>Create New User</button>
+      {!isDialogOpen && (
+        <div>
+          <button onClick={handleDialogOpen}>Create New User</button>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>First Name</TableCell>
+                  <TableCell>Last Name</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {users.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">No users found</TableCell>
+                  </TableRow>
+                )}
+                {users.map(user => (
+                  <TableRow key={user.user_id}>
+                    <TableCell>{user.first_name}</TableCell>
+                    <TableCell>{user.last_name}</TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="error" onClick={() => handleDeleteUser(user.user_id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              </Table>
+            </TableContainer>
+        </div>
+      )}
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New User</h2>

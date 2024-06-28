@@ -111,40 +111,44 @@ function Exercise() {
   return (
     <div>
       <h1>Exercises</h1>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Exercise Class Name</TableCell>
-              <TableCell>Duration (seconds)</TableCell>
-              <TableCell>Rest (seconds)</TableCell>
-              <TableCell>Repeat</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-          {exercises.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">No exercises found</TableCell>
-              </TableRow>
-            )}
-            {combinedData.map(exercise => (
-              <TableRow key={exercise.exercise_id}>
-                <TableCell>{exercise.exerciseClassName}</TableCell>
-                <TableCell>{exercise.duration_seconds}</TableCell>
-                <TableCell>{exercise.rest_seconds}</TableCell>
-                <TableCell>{exercise.repeat}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="error" onClick={() => handleDeleteExercise(exercise.exercise_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <button onClick={handleDialogOpen}>Create New Exercise</button>
+      {!isDialogOpen && (
+        <div>
+          <button onClick={handleDialogOpen}>Create New Exercise</button>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Exercise Class Name</TableCell>
+                  <TableCell>Duration (seconds)</TableCell>
+                  <TableCell>Rest (seconds)</TableCell>
+                  <TableCell>Repeat</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+              {exercises.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">No exercises found</TableCell>
+                  </TableRow>
+                )}
+                {combinedData.map(exercise => (
+                  <TableRow key={exercise.exercise_id}>
+                    <TableCell>{exercise.exerciseClassName}</TableCell>
+                    <TableCell>{exercise.duration_seconds}</TableCell>
+                    <TableCell>{exercise.rest_seconds}</TableCell>
+                    <TableCell>{exercise.repeat}</TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="error" onClick={() => handleDeleteExercise(exercise.exercise_id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Exercise</h2>

@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.MuiTable-root {
+  border-collapse: collapse;
+  width: 10%;
+}
+
+.MuiTable-root th,
+.MuiTable-root td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.MuiTable-root th {
+  background-color: #f2f2f2;
+}

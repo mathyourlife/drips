@@ -84,36 +84,40 @@ function Routine() {
   return (
     <div>
       <h1>Routines</h1>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Source</TableCell> {/* Add Source column */}
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {routines.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={3} align="center">No routines found</TableCell>
-              </TableRow>
-            )}
-            {routines.map(routine => (
-              <TableRow key={routine.routine_id}>
-                <TableCell>{routine.name}</TableCell>
-                <TableCell>{routine.source}</TableCell> {/* Display Source */}
-                <TableCell>
-                  <Button variant="contained" color="error" onClick={() => handleDeleteRoutine(routine.routine_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <button onClick={handleDialogOpen}>Create New Routine</button>
+      {!isDialogOpen && (
+        <div>
+          <button onClick={handleDialogOpen}>Create New Routine</button>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Source</TableCell> {/* Add Source column */}
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {routines.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">No routines found</TableCell>
+                  </TableRow>
+                )}
+                {routines.map(routine => (
+                  <TableRow key={routine.routine_id}>
+                    <TableCell>{routine.name}</TableCell>
+                    <TableCell>{routine.source}</TableCell> {/* Display Source */}
+                    <TableCell>
+                      <Button variant="contained" color="error" onClick={() => handleDeleteRoutine(routine.routine_id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
       {isDialogOpen && (
         <div user="dialog">
           <h2>Create New Routine</h2>
