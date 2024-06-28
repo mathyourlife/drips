@@ -6,6 +6,7 @@ function User() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newFirstName, setNewFirstName] = useState('');
   const [newLastName, setNewLastName] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState(null); // For editing
 
   useEffect(() => {
     fetch('/api/user')
@@ -63,6 +64,41 @@ function User() {
       .catch(error => console.error('Error deleting user:', error));
   };
 
+  const handleEditUser = (userId) => {
+    const user = users.find(u => u.user_id === userId);
+    if (user) {
+      setNewFirstName(user.first_name);
+      setNewLastName(user.last_name);
+      setSelectedUserId(userId);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    const updatedUser = {
+      user: {
+        first_name: newFirstName,
+        last_name: newLastName
+      }
+    };
+
+    fetch(`/api/user/${selectedUserId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedUser)
+    })
+      .then(res => res.json())
+      .then(data => {
+        const updatedUsers = users.map(u => (u.user_id === selectedUserId ? data.user : u));
+        setUsers(updatedUsers);
+        setIsDialogOpen(false);
+        setNewFirstName('');
+        setNewLastName('');
+        setSelectedUserId(null); // Reset after saving
+      })
+      .catch(error => console.error('Error updating user:', error));
+  };
+
   const handleDialogOpen = () => {
     setIsDialogOpen(true);
   };
@@ -71,6 +107,7 @@ function User() {
     setNewFirstName('');
     setNewLastName('');
     setIsDialogOpen(false);
+    setSelectedUserId(null);
   };
 
   const handleFirstNameChange = (event) => {
@@ -107,6 +144,9 @@ function User() {
                     <TableCell>{user.first_name}</TableCell>
                     <TableCell>{user.last_name}</TableCell>
                     <TableCell>
+                      <Button variant="contained" color="primary" onClick={() => handleEditUser(user.user_id)}>
+                        Edit
+                      </Button>
                       <Button variant="contained" color="error" onClick={() => handleDeleteUser(user.user_id)}>
                         Delete
                       </Button>
@@ -120,7 +160,7 @@ function User() {
       )}
       {isDialogOpen && (
         <div user="dialog">
-          <h2>Create New User</h2>
+          <h2>{selectedUserId ? 'Edit User' : 'Create New User'}</h2>
           <div>
             <label htmlFor="firstname">First Name:</label>
             <input
@@ -139,7 +179,11 @@ function User() {
               onChange={handleLastNameChange}
             />
           </div>
-          <button onClick={handleCreateUser}>Create</button>
+          {selectedUserId ? (
+            <button onClick={handleSaveEdit}>Save Changes</button>
+          ) : (
+            <button onClick={handleCreateUser}>Create</button>
+          )}
           <button onClick={handleDialogClose}>Cancel</button>
         </div>
       )}

@@ -46,6 +46,7 @@ type DripsServiceClient interface {
 	Users(ctx context.Context, in *UsersRequest, opts ...grpc.CallOption) (*UsersResponse, error)
 	UserCreate(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreateResponse, error)
 	UserDelete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*UserDeleteResponse, error)
+	UserUpdate(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserUpdateResponse, error)
 }
 
 type dripsServiceClient struct {
@@ -272,6 +273,15 @@ func (c *dripsServiceClient) UserDelete(ctx context.Context, in *UserDeleteReque
 	return out, nil
 }
 
+func (c *dripsServiceClient) UserUpdate(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserUpdateResponse, error) {
+	out := new(UserUpdateResponse)
+	err := c.cc.Invoke(ctx, "/drips.DripsService/UserUpdate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DripsServiceServer is the server API for DripsService service.
 // All implementations must embed UnimplementedDripsServiceServer
 // for forward compatibility
@@ -300,6 +310,7 @@ type DripsServiceServer interface {
 	Users(context.Context, *UsersRequest) (*UsersResponse, error)
 	UserCreate(context.Context, *UserCreateRequest) (*UserCreateResponse, error)
 	UserDelete(context.Context, *UserDeleteRequest) (*UserDeleteResponse, error)
+	UserUpdate(context.Context, *UserUpdateRequest) (*UserUpdateResponse, error)
 	mustEmbedUnimplementedDripsServiceServer()
 }
 
@@ -378,6 +389,9 @@ func (UnimplementedDripsServiceServer) UserCreate(context.Context, *UserCreateRe
 }
 func (UnimplementedDripsServiceServer) UserDelete(context.Context, *UserDeleteRequest) (*UserDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserDelete not implemented")
+}
+func (UnimplementedDripsServiceServer) UserUpdate(context.Context, *UserUpdateRequest) (*UserUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserUpdate not implemented")
 }
 func (UnimplementedDripsServiceServer) mustEmbedUnimplementedDripsServiceServer() {}
 
@@ -824,6 +838,24 @@ func _DripsService_UserDelete_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DripsService_UserUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DripsServiceServer).UserUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/drips.DripsService/UserUpdate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DripsServiceServer).UserUpdate(ctx, req.(*UserUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DripsService_ServiceDesc is the grpc.ServiceDesc for DripsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -926,6 +958,10 @@ var DripsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserDelete",
 			Handler:    _DripsService_UserDelete_Handler,
+		},
+		{
+			MethodName: "UserUpdate",
+			Handler:    _DripsService_UserUpdate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

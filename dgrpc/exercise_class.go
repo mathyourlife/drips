@@ -62,7 +62,6 @@ func (s *DripsServer) ExerciseClass(ctx context.Context, req *proto.ExerciseClas
 	return &proto.ExerciseClassResponse{
 		ExerciseClass: &ec,
 	}, nil
-
 }
 
 // Implement your gRPC methods

@@ -33,6 +33,7 @@ service DripsService {
     rpc Users(UsersRequest) returns (UsersResponse);
     rpc UserCreate(UserCreateRequest) returns (UserCreateResponse);
     rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse);
+    rpc UserUpdate(UserUpdateRequest) returns (UserUpdateResponse);
 }
 
 message ExerciseRequest {
@@ -204,6 +205,12 @@ message UserDeleteRequest {
     int32 user_id = 1;
 }
 message UserDeleteResponse {
+}
+message UserUpdateRequest {
+    User user = 1;
+}
+message UserUpdateResponse {
+    User user = 1;
 }
 
 message User {

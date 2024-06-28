@@ -84,3 +84,33 @@ func (s *DripsServer) UserDelete(ctx context.Context, req *proto.UserDeleteReque
 
 	return &proto.UserDeleteResponse{}, nil
 }
+
+// Update the user in the database
+func (s *DripsServer) UserUpdate(ctx context.Context, req *proto.UserUpdateRequest) (*proto.UserUpdateResponse, error) {
+	_, err := s.db.Exec(`
+	UPDATE user
+	SET first_name = ?, last_name = ?
+	WHERE user_id = ?
+	`, req.User.FirstName, req.User.LastName, req.User.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	var u proto.User
+	err = s.db.QueryRow(`
+	SELECT
+		user_id, first_name, last_name
+	FROM user
+	WHERE user_id = ?`, req.User.UserId).Scan(
+		&u.UserId,
+		&u.FirstName,
+		&u.LastName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.UserUpdateResponse{
+		User: &u,
+	}, nil
+}
