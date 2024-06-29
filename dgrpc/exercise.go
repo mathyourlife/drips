@@ -11,9 +11,9 @@ func (s *DripsServer) ExerciseCreate(ctx context.Context, req *proto.ExerciseCre
 	// Create the exercise in the database
 
 	result, err := s.db.Exec(`
-        INSERT INTO exercise (name, exercise_class_id, duration_seconds, rest_seconds, repeat)
+        INSERT INTO exercise (exercise_class_id, name, duration_seconds, rest_seconds, repeat)
         VALUES (?, ?, ?, ?, ?)
-        `, req.Exercise.Name, req.Exercise.ExerciseClassId, req.Exercise.DurationSeconds, req.Exercise.RestSeconds, req.Exercise.Repeat)
+        `, req.Exercise.ExerciseClassId, req.Exercise.Name, req.Exercise.DurationSeconds, req.Exercise.RestSeconds, req.Exercise.Repeat)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +28,11 @@ func (s *DripsServer) ExerciseCreate(ctx context.Context, req *proto.ExerciseCre
 	var e proto.Exercise
 	err = s.db.QueryRow(`
         SELECT
-			name, exercise_id, exercise_class_id, duration_seconds, rest_seconds, repeat
+			exercise_id, name, exercise_class_id, duration_seconds, rest_seconds, repeat
         FROM exercise
         WHERE exercise_id = ?`, lastInsertID).Scan(
-		&e.Name,
 		&e.ExerciseId,
+		&e.Name,
 		&e.ExerciseClassId,
 		&e.DurationSeconds,
 		&e.RestSeconds,
@@ -47,11 +47,34 @@ func (s *DripsServer) ExerciseCreate(ctx context.Context, req *proto.ExerciseCre
 	}, nil
 }
 
+func (s *DripsServer) Exercise(ctx context.Context, req *proto.ExerciseRequest) (*proto.ExerciseResponse, error) {
+	var e proto.Exercise
+	err := s.db.QueryRow(`
+	SELECT
+		exercise_id, name, exercise_class_id, duration_seconds, rest_seconds, repeat
+	FROM exercise
+	WHERE exercise_id = ?`, req.ExerciseId).Scan(
+		&e.ExerciseId,
+		&e.Name,
+		&e.ExerciseClassId,
+		&e.DurationSeconds,
+		&e.RestSeconds,
+		&e.Repeat,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ExerciseResponse{
+		Exercise: &e,
+	}, nil
+}
+
 func (s *DripsServer) Exercises(ctx context.Context, req *proto.ExercisesRequest) (*proto.ExercisesResponse, error) {
 	var es []*proto.Exercise
 	rows, err := s.db.Query(`
         SELECT
-			name, exercise_id, exercise_class_id, duration_seconds, rest_seconds, repeat
+			exercise_id, name, exercise_class_id, duration_seconds, rest_seconds, repeat
         FROM exercise`)
 	if err != nil {
 		return nil, err
@@ -59,7 +82,7 @@ func (s *DripsServer) Exercises(ctx context.Context, req *proto.ExercisesRequest
 	defer rows.Close()
 	for rows.Next() {
 		var e proto.Exercise
-		err := rows.Scan(&e.Name, &e.ExerciseId, &e.ExerciseClassId, &e.DurationSeconds, &e.RestSeconds, &e.Repeat)
+		err := rows.Scan(&e.ExerciseId, &e.Name, &e.ExerciseClassId, &e.DurationSeconds, &e.RestSeconds, &e.Repeat)
 		if err != nil {
 			return nil, err
 		}
@@ -88,9 +111,9 @@ func (s *DripsServer) ExerciseDelete(ctx context.Context, req *proto.ExerciseDel
 func (s *DripsServer) ExerciseUpdate(ctx context.Context, req *proto.ExerciseUpdateRequest) (*proto.ExerciseUpdateResponse, error) {
 	_, err := s.db.Exec(`
 	UPDATE exercise
-	SET name = ?, exercise_class_id = ?, duration_seconds = ?, rest_seconds = ?, repeat = ?
+	SET exercise_class_id = ?, name = ?, duration_seconds = ?, rest_seconds = ?, repeat = ?
 	WHERE exercise_id = ?
-	`, req.Exercise.Name, req.Exercise.ExerciseClassId, req.Exercise.DurationSeconds, req.Exercise.RestSeconds, req.Exercise.Repeat, req.Exercise.ExerciseId)
+	`, req.Exercise.ExerciseClassId, req.Exercise.Name, req.Exercise.DurationSeconds, req.Exercise.RestSeconds, req.Exercise.Repeat, req.Exercise.ExerciseId)
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@ import (
 func (s *HTTPServer) exercises() {
 	s.mux.HandleFunc("GET /api/exercise", s.handleExercise)
 	s.mux.HandleFunc("POST /api/exercise", s.handleExerciseCreate)
+	s.mux.HandleFunc("GET /api/exercise/{exerciseID}", s.handleExerciseGet)
 	s.mux.HandleFunc("PUT /api/exercise/{exerciseID}", s.handleExerciseUpdate)
 	s.mux.HandleFunc("DELETE /api/exercise/{exerciseID}", s.handleExerciseDelete)
 }
@@ -24,6 +25,31 @@ func (s *HTTPServer) Exercises() (*proto.ExercisesResponse, error) {
 	}
 
 	return response, nil
+}
+
+func (s *HTTPServer) handleExerciseGet(w http.ResponseWriter, r *http.Request) {
+	eIDstr := r.PathValue("exerciseID")
+	eID, err := strconv.Atoi(eIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse exercise ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	response, err := s.client.Exercise(context.Background(), &proto.ExerciseRequest{
+		ExerciseId: int32(eID),
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
 }
 
 func (s *HTTPServer) handleExercise(w http.ResponseWriter, r *http.Request) {
