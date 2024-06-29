@@ -6,7 +6,7 @@ function User() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newFirstName, setNewFirstName] = useState('');
   const [newLastName, setNewLastName] = useState('');
-  const [selectedUserId, setSelectedUserId] = useState(null); // For editing
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
     fetch('/api/user')
@@ -52,7 +52,7 @@ function User() {
         if (!res.ok) {
           throw new Error('Failed to delete user');
         }
-        return res.json(); // Assuming the response contains the updated list
+        return res.json();
       })
       .then(data => {
         if (data.users) {
@@ -94,7 +94,7 @@ function User() {
         setIsDialogOpen(false);
         setNewFirstName('');
         setNewLastName('');
-        setSelectedUserId(null); // Reset after saving
+        setSelectedUserId(null);
       })
       .catch(error => console.error('Error updating user:', error));
   };

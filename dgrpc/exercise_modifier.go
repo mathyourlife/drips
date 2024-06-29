@@ -98,3 +98,33 @@ func (s *DripsServer) ExerciseModifierDelete(ctx context.Context, req *proto.Exe
 
 	return &proto.ExerciseModifierDeleteResponse{}, nil
 }
+
+// Update the exercise modifier in the database
+func (s *DripsServer) ExerciseModifierUpdate(ctx context.Context, req *proto.ExerciseModifierUpdateRequest) (*proto.ExerciseModifierUpdateResponse, error) {
+	_, err := s.db.Exec(`
+	UPDATE exercise_modifier
+	SET exercise_id = ?, modifier_id = ?
+	WHERE exercise_modifier_id = ?
+	`, req.ExerciseModifier.ExerciseId, req.ExerciseModifier.ModifierId, req.ExerciseModifier.ExerciseModifierId)
+	if err != nil {
+		return nil, err
+	}
+
+	var em proto.ExerciseModifier
+	err = s.db.QueryRow(`
+	SELECT
+		exercise_modifier_id, exercise_id, modifier_id
+	FROM exercise_modifier
+	WHERE exercise_modifier_id = ?`, req.ExerciseModifier.ExerciseModifierId).Scan(
+		&em.ExerciseModifierId,
+		&em.ExerciseId,
+		&em.ModifierId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ExerciseModifierUpdateResponse{
+		ExerciseModifier: &em,
+	}, nil
+}

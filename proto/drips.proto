@@ -8,26 +8,31 @@ service DripsService {
     rpc Exercises(ExercisesRequest) returns (ExercisesResponse);
     rpc ExerciseCreate(ExerciseCreateRequest) returns (ExerciseCreateResponse);
     rpc ExerciseDelete(ExerciseDeleteRequest) returns (ExerciseDeleteResponse);
+    rpc ExerciseUpdate(ExerciseUpdateRequest) returns (ExerciseUpdateResponse);
 
     rpc ExerciseClass(ExerciseClassRequest) returns (ExerciseClassResponse);
     rpc ExerciseClasses(ExerciseClassesRequest) returns (ExerciseClassesResponse);
     rpc ExerciseClassCreate(ExerciseClassCreateRequest) returns (ExerciseClassCreateResponse);
     rpc ExerciseClassDelete(ExerciseClassDeleteRequest) returns (ExerciseClassDeleteResponse);
+    rpc ExerciseClassUpdate(ExerciseClassUpdateRequest) returns (ExerciseClassUpdateResponse);
 
     rpc ExerciseModifier(ExerciseModifierRequest) returns (ExerciseModifierResponse);
     rpc ExerciseModifiers(ExerciseModifiersRequest) returns (ExerciseModifiersResponse);
     rpc ExerciseModifierCreate(ExerciseModifierCreateRequest) returns (ExerciseModifierCreateResponse);
     rpc ExerciseModifierDelete(ExerciseModifierDeleteRequest) returns (ExerciseModifierDeleteResponse);
+    rpc ExerciseModifierUpdate(ExerciseModifierUpdateRequest) returns (ExerciseModifierUpdateResponse);
 
     rpc Modifier(ModifierRequest) returns (ModifierResponse);
     rpc Modifiers(ModifiersRequest) returns (ModifiersResponse);
     rpc ModifierCreate(ModifierCreateRequest) returns (ModifierCreateResponse);
     rpc ModifierDelete(ModifierDeleteRequest) returns (ModifierDeleteResponse);
+    rpc ModifierUpdate(ModifierUpdateRequest) returns (ModifierUpdateResponse);
 
     rpc Routine(RoutineRequest) returns (RoutineResponse);
     rpc Routines(RoutinesRequest) returns (RoutinesResponse);
     rpc RoutineCreate(RoutineCreateRequest) returns (RoutineCreateResponse);
     rpc RoutineDelete(RoutineDeleteRequest) returns (RoutineDeleteResponse);
+    rpc RoutineUpdate(RoutineUpdateRequest) returns (RoutineUpdateResponse);
 
     rpc User(UserRequest) returns (UserResponse);
     rpc Users(UsersRequest) returns (UsersResponse);
@@ -57,6 +62,12 @@ message ExerciseDeleteRequest {
     int32 exercise_id = 1;
 }
 message ExerciseDeleteResponse {
+}
+message ExerciseUpdateRequest {
+    Exercise exercise = 1;
+}
+message ExerciseUpdateResponse {
+    Exercise exercise = 1;
 }
 
 message Exercise {
@@ -90,6 +101,12 @@ message ExerciseClassDeleteRequest {
 }
 message ExerciseClassDeleteResponse {
 }
+message ExerciseClassUpdateRequest {
+    ExerciseClass exercise_class = 1;
+}
+message ExerciseClassUpdateResponse {
+    ExerciseClass exercise_class = 1;
+}
 
 message ExerciseClass {
     int32 exercise_class_id = 1;
@@ -120,6 +137,12 @@ message ExerciseModifierDeleteRequest {
 }
 message ExerciseModifierDeleteResponse {
 }
+message ExerciseModifierUpdateRequest {
+    ExerciseModifier exercise_modifier = 1;
+}
+message ExerciseModifierUpdateResponse {
+    ExerciseModifier exercise_modifier = 1;
+}
 
 message ExerciseModifier {
     int32 exercise_modifier_id = 1;
@@ -149,6 +172,12 @@ message ModifierDeleteRequest {
 }
 message ModifierDeleteResponse {
 }
+message ModifierUpdateRequest {
+    Modifier modifier = 1;
+}
+message ModifierUpdateResponse {
+    Modifier modifier = 1;
+}
 
 message Modifier {
     int32 modifier_id = 1;
@@ -176,6 +205,12 @@ message RoutineDeleteRequest {
     int32 routine_id = 1;
 }
 message RoutineDeleteResponse {
+}
+message RoutineUpdateRequest {
+    Routine routine = 1;
+}
+message RoutineUpdateResponse {
+    Routine routine = 1;
 }
 
 message Routine {

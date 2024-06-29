@@ -83,3 +83,32 @@ func (s *DripsServer) ModifierDelete(ctx context.Context, req *proto.ModifierDel
 
 	return &proto.ModifierDeleteResponse{}, nil
 }
+
+// Update the modifier in the database
+func (s *DripsServer) ModifierUpdate(ctx context.Context, req *proto.ModifierUpdateRequest) (*proto.ModifierUpdateResponse, error) {
+	_, err := s.db.Exec(`
+	UPDATE modifier
+	SET name = ?
+	WHERE modifier_id = ?
+	`, req.Modifier.Name, req.Modifier.ModifierId)
+	if err != nil {
+		return nil, err
+	}
+
+	var m proto.Modifier
+	err = s.db.QueryRow(`
+	SELECT
+		modifier_id, name
+	FROM modifier
+	WHERE modifier_id = ?`, req.Modifier.ModifierId).Scan(
+		&m.ModifierId,
+		&m.Name,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ModifierUpdateResponse{
+		Modifier: &m,
+	}, nil
+}

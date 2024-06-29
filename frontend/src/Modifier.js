@@ -5,6 +5,7 @@ function Modifier() {
   const [modifiers, setModifiers] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newName, setNewName] = useState('');
+  const [selectedModifierId, setSelectedModifierId] = useState(null);
 
   useEffect(() => {
     fetch('/api/modifier')
@@ -48,7 +49,7 @@ function Modifier() {
         if (!res.ok) {
           throw new Error('Failed to delete modifier');
         }
-        return res.json(); // Assuming the response contains the updated list
+        return res.json();
       })
       .then(data => {
         if (data.modifiers) {
@@ -58,6 +59,38 @@ function Modifier() {
         }
       })
       .catch(error => console.error('Error deleting modifier:', error));
+  };
+
+  const handleEditModifier = (modifierId) => {
+    const modifier = modifiers.find(m => m.modifier_id === modifierId);
+    if (modifier) {
+      setNewName(modifier.name);
+      setSelectedModifierId(modifierId);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    const updatedModifier = {
+      modifier: {
+        name: newName,
+      }
+    };
+
+    fetch(`/api/modifier/${selectedModifierId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedModifier)
+    })
+      .then(res => res.json())
+      .then(data => {
+        const updatedModifiers = modifiers.map(m => (m.modifier_id === selectedModifierId ? data.modifier : m));
+        setModifiers(updatedModifiers);
+        setIsDialogOpen(false);
+        setNewName('');
+        setSelectedModifierId(null);
+      })
+      .catch(error => console.error('Error updating modifier:', error));
   };
 
   const handleDialogOpen = () => {
@@ -97,6 +130,9 @@ function Modifier() {
                   <TableRow key={modifier.modifier_id}>
                     <TableCell>{modifier.name}</TableCell>
                     <TableCell>
+                      <Button variant="contained" color="primary" onClick={() => handleEditModifier(modifier.modifier_id)}>
+                        Edit
+                      </Button>
                       <Button variant="contained" color="error" onClick={() => handleDeleteModifier(modifier.modifier_id)}>
                         Delete
                       </Button>
@@ -110,7 +146,7 @@ function Modifier() {
       )}
       {isDialogOpen && (
         <div user="dialog">
-          <h2>Create New Modifier</h2>
+          <h2>{selectedModifierId ? 'Edit Modifier' : 'Create New Modifier'}</h2>
           <div>
             <label htmlFor="name">Name:</label>
             <input
@@ -120,7 +156,11 @@ function Modifier() {
               onChange={handleNameChange}
             />
           </div>
-          <button onClick={handleCreateModifier}>Create</button>
+          {selectedModifierId ? (
+            <button onClick={handleSaveEdit}>Save Changes</button>
+          ) : (
+            <button onClick={handleCreateModifier}>Create</button>
+          )}
           <button onClick={handleDialogClose}>Cancel</button>
         </div>
       )}

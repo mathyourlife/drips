@@ -14,6 +14,7 @@ func (s *HTTPServer) exerciseClassHandlers() {
 	s.mux.HandleFunc("GET /api/exercise_class", s.handleExerciseClass)
 	s.mux.HandleFunc("POST /api/exercise_class", s.handleExerciseClassCreate)
 	s.mux.HandleFunc("GET /api/exercise_class/{exerciseClassID}", s.handleExerciseClassGet)
+	s.mux.HandleFunc("PUT /api/exercise_class/{exerciseClassID}", s.handleExerciseClassUpdate)
 	s.mux.HandleFunc("DELETE /api/exercise_class/{exerciseClassID}", s.handleExerciseClassDelete)
 }
 
@@ -82,6 +83,43 @@ func (s *HTTPServer) handleExerciseClassCreate(w http.ResponseWriter, r *http.Re
 
 	// Send the gRPC request to the server
 	response, err := s.client.ExerciseClassCreate(context.Background(), &request)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
+}
+
+func (s *HTTPServer) handleExerciseClassUpdate(w http.ResponseWriter, r *http.Request) {
+	cIDstr := r.PathValue("exerciseClassID")
+	cID, err := strconv.Atoi(cIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse exercise class ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Unmarshal the request body into a protobuf message
+	var request proto.ExerciseClassUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if request.ExerciseClass == nil {
+		http.Error(w, "Missing exercise class in request body", http.StatusBadRequest)
+		return
+	}
+	request.ExerciseClass.ExerciseClassId = int32(cID)
+
+	// Send the gRPC request to the server
+	response, err := s.client.ExerciseClassUpdate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return

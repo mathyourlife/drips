@@ -84,3 +84,33 @@ func (s *DripsServer) RoutineDelete(ctx context.Context, req *proto.RoutineDelet
 
 	return &proto.RoutineDeleteResponse{}, nil
 }
+
+// Update the routine in the database
+func (s *DripsServer) RoutineUpdate(ctx context.Context, req *proto.RoutineUpdateRequest) (*proto.RoutineUpdateResponse, error) {
+	_, err := s.db.Exec(`
+	UPDATE routine
+	SET name = ?, source = ?
+	WHERE routine_id = ?
+	`, req.Routine.Name, req.Routine.Source, req.Routine.RoutineId)
+	if err != nil {
+		return nil, err
+	}
+
+	var r proto.Routine
+	err = s.db.QueryRow(`
+	SELECT
+		routine_id, name, source
+	FROM routine
+	WHERE routine_id = ?`, req.Routine.RoutineId).Scan(
+		&r.RoutineId,
+		&r.Name,
+		&r.Source,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.RoutineUpdateResponse{
+		Routine: &r,
+	}, nil
+}

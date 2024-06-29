@@ -13,6 +13,7 @@ import (
 func (s *HTTPServer) exercises() {
 	s.mux.HandleFunc("GET /api/exercise", s.handleExercise)
 	s.mux.HandleFunc("POST /api/exercise", s.handleExerciseCreate)
+	s.mux.HandleFunc("PUT /api/exercise/{exerciseID}", s.handleExerciseUpdate)
 	s.mux.HandleFunc("DELETE /api/exercise/{exerciseID}", s.handleExerciseDelete)
 }
 
@@ -56,6 +57,43 @@ func (s *HTTPServer) handleExerciseCreate(w http.ResponseWriter, r *http.Request
 
 	// Send the gRPC request to the server
 	response, err := s.client.ExerciseCreate(context.Background(), &request)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
+}
+
+func (s *HTTPServer) handleExerciseUpdate(w http.ResponseWriter, r *http.Request) {
+	eIDstr := r.PathValue("exerciseID")
+	eID, err := strconv.Atoi(eIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse exercise ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Unmarshal the request body into a protobuf message
+	var request proto.ExerciseUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if request.Exercise == nil {
+		http.Error(w, "Missing exercise in request body", http.StatusBadRequest)
+		return
+	}
+	request.Exercise.ExerciseId = int32(eID)
+
+	// Send the gRPC request to the server
+	response, err := s.client.ExerciseUpdate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return

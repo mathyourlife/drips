@@ -10,6 +10,7 @@ function Exercise() {
   const [newDurationSeconds, setNewDurationSeconds] = useState('');
   const [newRestSeconds, setNewRestSeconds] = useState('');
   const [newRepeat, setNewRepeat] = useState('');
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
 
   useEffect(() => {
     // Fetch exercises data
@@ -83,6 +84,50 @@ function Exercise() {
       .catch(error => console.error('Error deleting exercise:', error));
   };
 
+  const handleEditExercise = (exerciseId) => {
+    const exercise = exercises.find(e => e.exercise_id === exerciseId);
+    if (exercise) {
+      setNewExerciseName(exercise.name);
+      setNewExerciseClassId(exercise.exercise_class_id);
+      setNewDurationSeconds(exercise.duration_seconds);
+      setNewRestSeconds(exercise.rest_seconds);
+      setNewRepeat(exercise.repeat);
+      setSelectedExerciseId(exerciseId);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    const updatedExercise = {
+      exercise: {
+        name: newExerciseName,
+        exercise_class_id: parseInt(newExerciseClassId),
+        duration_seconds: parseInt(newDurationSeconds),
+        rest_seconds: parseInt(newRestSeconds),
+        repeat: parseInt(newRepeat)
+      }
+    };
+
+    fetch(`/api/exercise/${selectedExerciseId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedExercise)
+    })
+      .then(res => res.json())
+      .then(data => {
+        const updatedExercises = exercises.map(e => (e.exercise_id === selectedExerciseId ? data.exercise : e));
+        setExercises(updatedExercises);
+        setIsDialogOpen(false);
+        setNewExerciseName('');
+        setNewExerciseClassId('');
+        setNewDurationSeconds('');
+        setNewRestSeconds('');
+        setNewRepeat('');
+        setSelectedExerciseId(null);
+      })
+      .catch(error => console.error('Error updating exercise:', error));
+  };
+
   const handleDialogOpen = () => {
     setIsDialogOpen(true);
   };
@@ -148,6 +193,9 @@ function Exercise() {
                     <TableCell>{exercise.rest_seconds}</TableCell>
                     <TableCell>{exercise.repeat}</TableCell>
                     <TableCell>
+                      <Button variant="contained" color="primary" onClick={() => handleEditExercise(exercise.exercise_id)}>
+                        Edit
+                      </Button>
                       <Button variant="contained" color="error" onClick={() => handleDeleteExercise(exercise.exercise_id)}>
                         Delete
                       </Button>
@@ -161,7 +209,7 @@ function Exercise() {
       )}
       {isDialogOpen && (
         <div user="dialog">
-          <h2>Create New Exercise</h2>
+          <h2>{selectedExerciseId ? 'Edit Exercise' : 'Create New Exercise'}</h2>
           <div>
             <label htmlFor="name">Exercise Name:</label>
             <input
@@ -216,8 +264,11 @@ function Exercise() {
               onChange={handleRepeatChange}
             />
           </div>
-          <button onClick={handleCreateExercise}>Create</button>
-          <button onClick={handleDialogClose}>Cancel</button>
+          {selectedExerciseId ? (
+            <button onClick={handleSaveEdit}>Save Changes</button>
+          ) : (
+            <button onClick={handleCreateExercise}>Create</button>
+          )}
         </div>
       )}
       </div>

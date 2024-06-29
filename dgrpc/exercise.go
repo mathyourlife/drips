@@ -83,3 +83,36 @@ func (s *DripsServer) ExerciseDelete(ctx context.Context, req *proto.ExerciseDel
 
 	return &proto.ExerciseDeleteResponse{}, nil
 }
+
+// Update the exercise in the database
+func (s *DripsServer) ExerciseUpdate(ctx context.Context, req *proto.ExerciseUpdateRequest) (*proto.ExerciseUpdateResponse, error) {
+	_, err := s.db.Exec(`
+	UPDATE exercise
+	SET name = ?, exercise_class_id = ?, duration_seconds = ?, rest_seconds = ?, repeat = ?
+	WHERE exercise_id = ?
+	`, req.Exercise.Name, req.Exercise.ExerciseClassId, req.Exercise.DurationSeconds, req.Exercise.RestSeconds, req.Exercise.Repeat, req.Exercise.ExerciseId)
+	if err != nil {
+		return nil, err
+	}
+
+	var e proto.Exercise
+	err = s.db.QueryRow(`
+	SELECT
+		exercise_id, name, exercise_class_id, duration_seconds, rest_seconds, repeat
+	FROM exercise
+	WHERE exercise_id = ?`, req.Exercise.ExerciseId).Scan(
+		&e.ExerciseId,
+		&e.Name,
+		&e.ExerciseClassId,
+		&e.DurationSeconds,
+		&e.RestSeconds,
+		&e.Repeat,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ExerciseUpdateResponse{
+		Exercise: &e,
+	}, nil
+}

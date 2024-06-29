@@ -13,6 +13,7 @@ import (
 func (s *HTTPServer) modifiers() {
 	s.mux.HandleFunc("GET /api/modifier", s.handleModifier)
 	s.mux.HandleFunc("POST /api/modifier", s.handleModifierCreate)
+	s.mux.HandleFunc("PUT /api/modifier/{modifierID}", s.handleModifierUpdate)
 	s.mux.HandleFunc("DELETE /api/modifier/{modifierID}", s.handleModifierDelete)
 }
 
@@ -56,6 +57,43 @@ func (s *HTTPServer) handleModifierCreate(w http.ResponseWriter, r *http.Request
 
 	// Send the gRPC request to the server
 	response, err := s.client.ModifierCreate(context.Background(), &request)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
+}
+
+func (s *HTTPServer) handleModifierUpdate(w http.ResponseWriter, r *http.Request) {
+	modIDstr := r.PathValue("modifierID")
+	modID, err := strconv.Atoi(modIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse modifier ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Unmarshal the request body into a protobuf message
+	var request proto.ModifierUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if request.Modifier == nil {
+		http.Error(w, "Missing modifier in request body", http.StatusBadRequest)
+		return
+	}
+	request.Modifier.ModifierId = int32(modID)
+
+	// Send the gRPC request to the server
+	response, err := s.client.ModifierUpdate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return

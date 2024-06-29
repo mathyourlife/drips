@@ -6,6 +6,7 @@ function ExerciseClass() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState('');
   const [newShortName, setNewShortName] = useState('');
+  const [selectedExerciseClassId, setSelectedExerciseClassId] = useState(null);
 
   useEffect(() => {
     // Fetch exercise classes on initial render
@@ -21,7 +22,7 @@ function ExerciseClass() {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  const handleCreateClass = () => {
+  const handleCreateExerciseClass = () => {
     const newClass = {
       exercise_class: {
         name: newClassName,
@@ -36,10 +37,8 @@ function ExerciseClass() {
     })
       .then(res => res.json())
       .then(data => {
-        // Append the newly created exercise clase to the list
+        // Append the newly created exercise class to the list
         setExerciseClasses([...exerciseClasses, data.exercise_class]);
-        // Update the exerciseClasses state with the new data
-        // setExerciseClasses(data.exercise_classes); // Assuming the response returns the updated list
         setIsDialogOpen(false);
         setNewClassName('');
         setNewShortName('');
@@ -55,7 +54,7 @@ function ExerciseClass() {
         if (!res.ok) {
           throw new Error('Failed to delete exercise class');
         }
-        return res.json(); // Assuming the response contains the updated list
+        return res.json();
       })
       .then(data => {
         if (data.exercise_classes) {
@@ -65,6 +64,41 @@ function ExerciseClass() {
         }
       })
       .catch(error => console.error('Error deleting class:', error));
+  };
+
+  const handleEditExerciseClass = (exerciseClassId) => {
+    const exerciseClass = exerciseClasses.find(e => e.exercise_class_id === exerciseClassId);
+    if (exerciseClass) {
+      setNewClassName(exerciseClass.name);
+      setNewShortName(exerciseClass.short_name);
+      setSelectedExerciseClassId(exerciseClassId);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    const updatedExerciseClass = {
+      exercise_class: {
+        name: newClassName,
+        short_name: newShortName
+      }
+    };
+
+    fetch(`/api/exercise_class/${selectedExerciseClassId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedExerciseClass)
+    })
+      .then(res => res.json())
+      .then(data => {
+        const updatedExerciseClasses = exerciseClasses.map(e => (e.exercise_class_id === selectedExerciseClassId ? data.exercise_class : e));
+        setExerciseClasses(updatedExerciseClasses);
+        setIsDialogOpen(false);
+        setNewClassName('');
+        setNewShortName('');
+        setSelectedExerciseClassId(null);
+      })
+      .catch(error => console.error('Error updating exercise class:', error));
   };
 
   const handleDialogOpen = () => {
@@ -111,6 +145,9 @@ function ExerciseClass() {
                     <TableCell>{exerciseClass.name}</TableCell>
                     <TableCell>{exerciseClass.short_name}</TableCell>
                     <TableCell>
+                      <Button variant="contained" color="primary" onClick={() => handleEditExerciseClass(exerciseClass.exercise_class_id)}>
+                        Edit
+                      </Button>
                       <Button variant="contained" color="error" onClick={() => handleDeleteClass(exerciseClass.exercise_class_id)}>
                         Delete
                       </Button>
@@ -124,7 +161,7 @@ function ExerciseClass() {
       )}
       {isDialogOpen && (
         <div className="dialog">
-          <h2>Create New Exercise Class</h2>
+          <h2>{selectedExerciseClassId ? 'Edit Exercise Class' : 'Create New Exercise Class'}</h2>
           <div>
             <label htmlFor="name">Name:</label>
             <input
@@ -143,7 +180,11 @@ function ExerciseClass() {
               onChange={handleShortNameChange}
             />
           </div>
-          <button onClick={handleCreateClass}>Create</button>
+          {selectedExerciseClassId ? (
+            <button onClick={handleSaveEdit}>Save Changes</button>
+          ) : (
+            <button onClick={handleCreateExerciseClass}>Create</button>
+          )}
           <button onClick={handleDialogClose}>Cancel</button>
         </div>
       )}

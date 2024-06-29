@@ -13,6 +13,7 @@ import (
 func (s *HTTPServer) routines() {
 	s.mux.HandleFunc("GET /api/routine", s.handleRoutine)
 	s.mux.HandleFunc("POST /api/routine", s.handleRoutineCreate)
+	s.mux.HandleFunc("PUT /api/routine/{routineID}", s.handleRoutineUpdate)
 	s.mux.HandleFunc("DELETE /api/routine/{routineID}", s.handleRoutineDelete)
 }
 
@@ -56,6 +57,43 @@ func (s *HTTPServer) handleRoutineCreate(w http.ResponseWriter, r *http.Request)
 
 	// Send the gRPC request to the server
 	response, err := s.client.RoutineCreate(context.Background(), &request)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
+}
+
+func (s *HTTPServer) handleRoutineUpdate(w http.ResponseWriter, r *http.Request) {
+	rIDstr := r.PathValue("routineID")
+	rID, err := strconv.Atoi(rIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse routine ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Unmarshal the request body into a protobuf message
+	var request proto.RoutineUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unmarshal request body: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if request.Routine == nil {
+		http.Error(w, "Missing routine in request body", http.StatusBadRequest)
+		return
+	}
+	request.Routine.RoutineId = int32(rID)
+
+	// Send the gRPC request to the server
+	response, err := s.client.RoutineUpdate(context.Background(), &request)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
 		return
