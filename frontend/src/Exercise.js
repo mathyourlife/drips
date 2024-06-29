@@ -4,6 +4,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Butto
 function Exercise() {
   const [exercises, setExercises] = useState([]);
   const [exerciseClasses, setExerciseClasses] = useState([]);
+  const [modifiers, setModifiers] = useState([]);
+  const [exerciseModifiers, setExerciseModifiers] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseClassId, setNewExerciseClassId] = useState('');
@@ -22,16 +24,31 @@ function Exercise() {
     fetch('/api/exercise_class')
       .then(response => response.json())
       .then(data => setExerciseClasses(data.exercise_classes));
+
+    // Fetch modifiers data
+    fetch('/api/modifier')
+      .then(response => response.json())
+      .then(data => setModifiers(data.modifiers));
+
+    // Fetch exercise modifiers data
+    fetch('/api/exercise_modifier')
+      .then(response => response.json())
+      .then(data => setExerciseModifiers(data.exercise_modifiers));
   }, []);
 
-  // Combine data from both APIs
+  // Combine data from all APIs
   const combinedData = exercises.map(exercise => {
     const exerciseClass = exerciseClasses.find(
       classItem => classItem.exercise_class_id === exercise.exercise_class_id
     );
+    const modifiersForExercise = exerciseModifiers
+      .filter(em => em.exercise_id === exercise.exercise_id)
+      .map(em => modifiers.find(modifier => modifier.modifier_id === em.modifier_id));
+
     return {
       ...exercise,
       exerciseClassName: exerciseClass ? exerciseClass.name : 'N/A',
+      modifiers: modifiersForExercise,
     };
   });
 
@@ -176,13 +193,14 @@ function Exercise() {
                   <TableCell>Duration (seconds)</TableCell>
                   <TableCell>Rest (seconds)</TableCell>
                   <TableCell>Repeat</TableCell>
+                  <TableCell>Modifiers</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-              {exercises.length === 0 && (
+                {exercises.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">No exercises found</TableCell>
+                    <TableCell colSpan={7} align="center">No exercises found</TableCell>
                   </TableRow>
                 )}
                 {combinedData.map(exercise => (
@@ -192,6 +210,11 @@ function Exercise() {
                     <TableCell>{exercise.duration_seconds}</TableCell>
                     <TableCell>{exercise.rest_seconds}</TableCell>
                     <TableCell>{exercise.repeat}</TableCell>
+                    <TableCell>
+                      {exercise.modifiers.map(modifier => (
+                        <span key={modifier.modifier_id}>{modifier.name}, </span>
+                      ))}
+                    </TableCell>
                     <TableCell>
                       <Button variant="contained" color="primary" onClick={() => handleEditExercise(exercise.exercise_id)}>
                         Edit
@@ -269,6 +292,7 @@ function Exercise() {
           ) : (
             <button onClick={handleCreateExercise}>Create</button>
           )}
+          <button onClick={handleDialogClose}>Cancel</button>
         </div>
       )}
       </div>

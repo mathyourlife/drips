@@ -45,6 +45,26 @@ func (s *DripsServer) ExerciseModifierCreate(ctx context.Context, req *proto.Exe
 	}, nil
 }
 
+func (s *DripsServer) ExerciseModifier(ctx context.Context, req *proto.ExerciseModifierRequest) (*proto.ExerciseModifierResponse, error) {
+	var em proto.ExerciseModifier
+	err := s.db.QueryRow(`
+	SELECT
+		exercise_modifier_id, exercise_id, modifier_id
+	FROM exercise_modifier
+	WHERE exercise_modifier_id = ?`, req.ExerciseModifierId).Scan(
+		&em.ExerciseModifierId,
+		&em.ExerciseId,
+		&em.ModifierId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ExerciseModifierResponse{
+		ExerciseModifier: &em,
+	}, nil
+}
+
 // Implement your gRPC methods
 func (s *DripsServer) ExerciseModifiers(ctx context.Context, req *proto.ExerciseModifiersRequest) (*proto.ExerciseModifiersResponse, error) {
 	var ems []*proto.ExerciseModifier

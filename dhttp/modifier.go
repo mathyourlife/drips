@@ -13,6 +13,7 @@ import (
 func (s *HTTPServer) modifiers() {
 	s.mux.HandleFunc("GET /api/modifier", s.handleModifier)
 	s.mux.HandleFunc("POST /api/modifier", s.handleModifierCreate)
+	s.mux.HandleFunc("GET /api/modifier/{modifierID}", s.handleModifierGet)
 	s.mux.HandleFunc("PUT /api/modifier/{modifierID}", s.handleModifierUpdate)
 	s.mux.HandleFunc("DELETE /api/modifier/{modifierID}", s.handleModifierDelete)
 }
@@ -24,6 +25,31 @@ func (s *HTTPServer) Modifiers() (*proto.ModifiersResponse, error) {
 	}
 
 	return response, nil
+}
+
+func (s *HTTPServer) handleModifierGet(w http.ResponseWriter, r *http.Request) {
+	mIDstr := r.PathValue("modifierID")
+	mID, err := strconv.Atoi(mIDstr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse modifier ID: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	response, err := s.client.Modifier(context.Background(), &proto.ModifierRequest{
+		ModifierId: int32(mID),
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to send gRPC request: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal the gRPC response into JSON
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to marshal gRPC response: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonResponse)
 }
 
 func (s *HTTPServer) handleModifier(w http.ResponseWriter, r *http.Request) {

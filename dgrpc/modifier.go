@@ -43,6 +43,25 @@ func (s *DripsServer) ModifierCreate(ctx context.Context, req *proto.ModifierCre
 	}, nil
 }
 
+func (s *DripsServer) Modifier(ctx context.Context, req *proto.ModifierRequest) (*proto.ModifierResponse, error) {
+	var m proto.Modifier
+	err := s.db.QueryRow(`
+	SELECT
+		modifier_id, name
+	FROM modifier
+	WHERE modifier_id = ?`, req.ModifierId).Scan(
+		&m.ModifierId,
+		&m.Name,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ModifierResponse{
+		Modifier: &m,
+	}, nil
+}
+
 // Implement your gRPC methods
 func (s *DripsServer) Modifiers(ctx context.Context, req *proto.ModifiersRequest) (*proto.ModifiersResponse, error) {
 	// List all modifiers
