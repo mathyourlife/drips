@@ -4,7 +4,7 @@ go 1.22.4
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.18.1
-	github.com/mattn/go-sqlite3 v1.14.22
+	github.com/mattn/go-sqlite3 v1.14.24
 	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.34.2
 )
