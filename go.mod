@@ -6,7 +6,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/mattn/go-sqlite3 v1.14.22
 	google.golang.org/grpc v1.64.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
